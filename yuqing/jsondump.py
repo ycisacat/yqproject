@@ -21,7 +21,7 @@ def dump_bar():
 def dump_time_line():
     data=[]
     eve=Event()
-    result = eve.get_topic()
+    result = eve.get_tiemline()
     if len(result) == 0:
         month_list = [4,4,4,4,4,4,4,4]
         day_list = ['1','5','10','20','23','25','27','30']
@@ -57,18 +57,14 @@ def dump_line():
     return json.dumps(data, separators=(',', ':'))
 
 
-def dump_force():
+def dump_force(event_id,ctime='12:00'):
     """
     :return:关系图的数据
     """
     node_list = []
     edge_list = []
-    event_id = 'topicM_Duqn8gDRs'
-    name = NetworkScale().get_path(event_id)
-    print name
-    # file_name = DOC_DIR + '/' + name.encode('utf-8')
-    file_name = DOC_DIR+'/topic/广东一口腔科退休医生被砍30多刀 抢救无效去世[蜡烛]/2016-05-07 15:30:59/new_label_link.xls'
-
+    dir = NetworkScale().get_label(event_id,ctime)
+    file_name = DOC_DIR + '/' + dir['label_dir'].encode('utf-8')
     print file_name
     # file_name = BASE_DIR+'/network/result/new_label_link.xls'
     data = xlrd.open_workbook(file_name)

@@ -4,7 +4,7 @@ __author__ = 'yc'
 import multiprocessing as mul
 from network.main import *
 from crawler.class_increment import *
-from crawler.class_weibo1 import *
+from crawler.crawl_weibo1 import *
 
 reload(sys)
 sys.setdefaultencoding('utf-8')

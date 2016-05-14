@@ -1,7 +1,11 @@
 # coding=utf-8
-
+"""
+5.7:
+更新了新需求，处理了检测的猎头为随机的5个 main_weibo()
+并且程序是先更新在检测新事件 get_page()
+"""
 import sys
-from class_headhunter import *
+from crawl_headhunter import *
 from create_file import *
 from crawler.class_save_data import *
 from get_keyword.get_keyword import *
@@ -20,8 +24,8 @@ class WeiboPage():
     def __init__(self, one_user):
         """
         :param one_user: 用户的id，即是猎头的id
-         用户首页的源代码：homepage
-        :return:homepage
+
+        :return:
         """
         self.one_user = one_user
         self.weibo_list = []
@@ -38,6 +42,7 @@ class WeiboPage():
             float(int(random.uniform(1, 6)))) + '(X11; Ubuntu; Linux i686; rv:35.0) Gecko/20100101 Firefox/' + str(
             float(int(random.uniform(29, 36))))}
         self.all_all_topic = []
+        self.afore_all_uid = {}
         self.blog_id =''
         self.post_time = ''
         self.event_id = ''
@@ -54,9 +59,8 @@ class WeiboPage():
         # 匹配博文id 、博文 点赞 转发链接 转发 评论链接 评论 时间
         for tu in self.base_page:  # tu:每一条博文块
             # 判断是否今天博文
-            if (re.match('今天', tu[7])):  # tu[6]里找到标志为今天的时间
+            if (re.match('今天', tu[7])):  # tu[7]里找到标志为今天的时间
                 if len(tu[7]) > 0:
-                    # print "这是今天的博文"
                     self.dictwt.setdefault(tu[0], []).append(tu[1])
                     self.dictwt.setdefault(tu[0], []).append(tu[2])  # 键为tu[0],即是博文id,tu[1]为没处理的博文
                     self.dictwt.setdefault(tu[0], []).append(tu[3])
@@ -65,11 +69,10 @@ class WeiboPage():
                     self.dictwt.setdefault(tu[0], []).append(tu[6])  # tu[5]是评论链接 tu[6]为评论数 tu[7]是时间
                     self.dictwt.setdefault(tu[0], []).append(tu[7])
                 else:
-                    pass  # 匹配博文 点赞 转发链接 转发 评论链接 评论 时间
+                    pass
 
-            elif (re.search('\d+分钟前', tu[7])):  # tu[6]里找到标志为几分钟前的时间
+            elif (re.search('\d+分钟前', tu[7])):  # tu[7]里找到标志为几分钟前的时间
                 if len(tu[7]) > 0:
-                    # print "这是今天的博文"
                     self.dictwt.setdefault(tu[0], []).append(tu[1])
                     self.dictwt.setdefault(tu[0], []).append(tu[2])  # 键为tu[0],即是博文id,tu[1]没处理的博文
                     self.dictwt.setdefault(tu[0], []).append(tu[3])
@@ -90,12 +93,13 @@ class WeiboPage():
         """
         转化时间格式
         :param item1: 时间
-        :return:标准格式的时间
+        :return:标准格式的时间 h:m:s
         """
         extra1 = re.compile('</span>.*$')  # 匹配输入字符串的结束位置
         today = re.compile('今天')
         ago = re.compile('\d+分钟前')
-        wbtime = re.sub(extra1, ' ', item1)  #
+
+        wbtime = re.sub(extra1, ' ', item1)
         t = time.strftime('%m' + '月' + '%d' + '日', time.localtime())
         t = t.decode('utf-8')
         wbtime = re.sub(today, t, wbtime)
@@ -111,7 +115,7 @@ class WeiboPage():
         sub_title = re.compile('<img.*?注')
         tag = re.compile('<.*?>')  # 去除标签
         link = re.compile('<a href=.*?>|http.*?</a>')  # 去除链接
-        content = re.sub(link, " ", item0)
+        content = re.sub(link, "", item0)
         content = re.sub(tag, '', content)
         content = re.sub(sub_title, '', content)
         # content = content.encode('utf-8', 'ignore')  # content为完成的博文
@@ -127,11 +131,11 @@ class WeiboPage():
         """
         all_dict = {}
         writing_time = []
-        weibo = []  # 存放一个人的所有博文
+        weibo = []       # 存放一个人的所有博文
         weibo_id = []
-        praise = []  # 赞
-        forward = []  # 转发
-        comment = []  # 评论
+        praise = []      # 赞
+        forward = []     # 转发
+        comment = []     # 评论
         forward_url = []
         comment_url = []
         blog_origin = []
@@ -172,16 +176,13 @@ class WeiboPage():
                     print "登陆失败"
                 self.add_text()
 
-            print "sda", len(self.dictwt.keys())
-
             for id in self.dictwt.keys():
                 print id
 
             if len(self.dictwt) > 0:
                 print "用户 ", i, "今天有发表博文"
                 for item0, item1 in self.dictwt.items():  # item0为tu[0],键=博文id. item1 = 值
-                    print "bianli", item0
-                    print 'lllllllll'
+
                     weibo_id.append(item0)  # 键=博文id
                     wbtime = self.cleaned_wbtime(item1[6])  # 清理博文时间
 
@@ -193,13 +194,15 @@ class WeiboPage():
                         blog_origin.append(blog_origin_one[0])
 
                     content = self.cleaned_weibo(item1[0])  # 清理博文
-                    writing_time.append(wbtime)  # 存放时间
-                    weibo.append(content)  # 存放博文
-                    praise.append(item1[1])  # 点赞量
-                    forward_url.append(item1[2])  # 转发量url
+
+                    writing_time.append(wbtime)             # 存放时间
+                    weibo.append(content)                   # 存放博文
+                    praise.append(item1[1])                 # 点赞量
+                    forward_url.append(item1[2])            # 转发量url
                     forward.append(item1[3])
-                    comment_url.append(item1[4])  # 评论量url
+                    comment_url.append(item1[4])            # 评论量url
                     comment.append(item1[5])
+
                     print "博文id", item0
                     print "博文", item1[0]
                     print "点赞", item1[1]
@@ -207,9 +210,6 @@ class WeiboPage():
                     print "评论", item1[5]
                     print '转发链接', item1[2]
                     print '评论链接', item1[4]
-                    # print 'weibo', weibo
-                    # print '时间', writing_time
-                    # print '链接', blog_origin
 
             else:
                 print "用户", i, "今天没有发表博文"
@@ -218,10 +218,10 @@ class WeiboPage():
                 # 各种列表打包
                 tw = zip(writing_time, weibo_id, weibo, praise, forward_url, forward, comment_url, comment, blog_origin)
                 all_dict.setdefault(i, tw)
-        except:
+        except :
             pass
-        return all_dict  # 返回字典，键为有动态的id，值为这个id的博文,时间,赞,转发,评论,博文链接组成的元组列表
 
+        return all_dict  # 返回字典，键为有动态的id，值为这个id的博文,时间,赞,转发,评论,博文链接组成的元组列表
 
     def write_hunter_txt(self, key, value):
         """
@@ -267,12 +267,22 @@ class WeiboPage():
         爬取猎头微博的评论内容： get_comment()
         爬取猎头的微博的转发路径方法： get_forward_path()
         搜索话题爬取话题相关微博的路径方法： get_topic()
+
+        先更新后检测
         :param p1: 用户博文的开始页
         :param p2: 用户博文的结束页
         :return:
         """
 
         try:
+            # 先更新
+            if self.all_all_topic:  # 之前检测到的话题存在
+                for uid, afore_tuple_list in self.afore_all_uid.items():
+                    for afore_tuple in afore_tuple_list:
+                        self.get_search_topic(uid, afore_tuple)  # 更新之前的猎头检测到的事件
+                print "更新完毕，开始检测其他事件"
+
+            # 更新完毕，开始检测
             print '正在爬取用户', self.one_user, '相关信息,开始时间:', time.time()
             one = self.one_id_text(self.one_user, p1, p2)  # 字典{id:所有内容}
             print "进入下一阶段"
@@ -281,7 +291,7 @@ class WeiboPage():
                 self.write_hunter_txt(one.keys(), one.values())
                 # self.get_comment(one.keys(), one.values())
                 # self.get_forward_path(one.keys(), one.values())
-                all_topic = self.get_topic(one.keys(), one.values()) # 三个列表元组 ,(话题, id, 博文)
+                all_topic = self.get_topic(one.keys(), one.values())  # 三个列表元组 ,(话题, id, 博文)
 
                 weibo_list = all_topic[2]
                 weibo_keywords = []
@@ -289,7 +299,10 @@ class WeiboPage():
                     one_weibo_key = Keyword().combine_keywords(one_weibo)  # 博文的关键词提取
                     weibo_keywords.append(one_weibo_key)
 
-                tp_and_wk=zip(all_topic[0],weibo_keywords,all_topic[1])  # 话题,博文关键字,话题id
+                tp_and_wk=zip(all_topic[0], weibo_keywords, all_topic[1])  # [(话题,博文关键字,话题id)]，列表
+
+                self.afore_all_uid.setdefault(one.keys()[0], tp_and_wk)  # 用字典保存，这个猎头检测到的新事件,键是猎头，值是元组列表
+
                 for one_tuple in tp_and_wk:
                     a = multiprocessing.Process(target=self.get_search_topic, args=(one.keys(), one_tuple))
                     a.start()
@@ -318,7 +331,11 @@ class WeiboPage():
                 topic = topic_patternts.findall(j[2])
 
                 if len(topic) > 0:
+
                     topic = [topic[0][0]+topic[0][1]]
+
+                    topic_clean_pattern = re.compile('(\[.*?])')
+                    topic = [re.sub(topic_clean_pattern, '', topic[0])]
 
                     if topic[0] not in self.all_all_topic:  # 对已搜索过的话题进行去除
                         weibo_topic.append(topic[0])
@@ -329,15 +346,14 @@ class WeiboPage():
                 else:
                     print "这篇博文没有话题，无法搜索"
 
-        self.all_all_topic += weibo_topic  # 全局变量,保存全部话题,为下一个猎头话题去重
+        self.all_all_topic = list(set(self.all_all_topic + weibo_topic))  # 全局变量,保存全部话题,为下一个猎头话题去重
 
         print 'weibo长度',len(weibo_topic)
         print 'weibo_id长度',len(blog_id_list)
         print "weibochangdu",len(weibo)
-
         for tp in weibo_topic:
             print "话题有：", tp
-        return weibo_topic, blog_id_list, weibo  # 三个列表的元组
+        return weibo_topic, blog_id_list, weibo  # 三个列表的元组， 返回还没有被检测的话题事件
 
     def get_search_topic(self, uid, tuple):
         """
@@ -351,8 +367,7 @@ class WeiboPage():
         blog_id = tuple[2]  # 话题id
 
         print tuple
-        print 'thereaaaaa',blog_id
-        print "正在搜索话题: ", topic
+        print "正在搜索话题关键词: ", topic
         hot_url = 'http://weibo.cn/search/mblog/?keyword=' + str(
             urllib2.quote(topic)) + '&sort=hot'
         print 'hot', hot_url
@@ -401,8 +416,6 @@ class WeiboPage():
                 corpus_dir = self.fold_dir + 'uid=' + str(uid) + '.txt'
                 label_dir = self.fold_dir + 'new_label_link.xls'
                 path = os.path.join(DOC_DIR,corpus_dir)
-                print path
-                print 'corpus_dir',corpus_dir
                 txt_file = open(path, 'w+')
                 big_v_num = 0
                 print "有", result_num[0], "条结果,判断为热点新闻"
@@ -438,12 +451,9 @@ class WeiboPage():
                             issuer_blog_id = issuer_blog_id_patternts.findall(item)
                             print "博文id", issuer_blog_id[0]
 
-                            # issuer_blog_patternts = re.compile('<span class="ctt">(.*?)</span>')
                             issuer_blog_patternts = re.compile('<span class="ctt">:(.*?)>赞')
                             issuer_blog_unclean = issuer_blog_patternts.findall(item)
                             issuer_blog = self.cleaned_weibo(issuer_blog_unclean[0])
-                            # clean_blog_patternts = re.compile('<.*?>')
-                            # issuer_blog = re.sub(clean_blog_patternts, '', issuer_blog)
                             extra1 = re.compile('&nbsp;.*$')
                             cleaned_issuer_blog = re.sub(extra1, '', issuer_blog)
                             print "净化的博文", cleaned_issuer_blog
@@ -530,7 +540,6 @@ class WeiboPage():
                                 txt_file.write(str(reason) + '\n')
                             txt_file.write('\n')
 
-                            # ---------------------------------
                         else:
                             issuer_id_name_patternts = re.compile(
                                 '<a class="nk" href="http://weibo.cn/(.*?)">(.*?)</a>')  # 匹配一段里面的名字和id
@@ -550,9 +559,6 @@ class WeiboPage():
 
                 print "文本写入完毕"
                 print "转发该话题的转发者是大的v个数：", big_v_num
-
-
-
 
                 return True
             else:
@@ -751,21 +757,31 @@ class WeiboPage():
 
 def main_weibo():
     MoblieWeibo().login('odlmyfbw@sina.cn', 'tttt5555')
+
     # 'odlmyfbw@sina.cn','tttt5555')#'1939777358@qq.com', '123456a')  # 734093894@qq.com   18826103742
+
     account = {
-            "人民日报": 2803301701, "新浪新闻": 2028810631, "凤凰周刊": 1267454277,
-            "网易新闻客户端": 1974808274, "北京晨报": 1646051850, "微博股票": 5578381471,
-            "头条新闻": 1618051664, "cctv5": 2993049293, "人民网": 2286908003,
-            "英国报姐": 3099016097,
-            "财经网": 1642088277, "新京报": 1644114654, "环球时报": 1974576991,
-            "中国新闻网": 1784473157, "三联生活周刊": 1191965271, "法制晚报": 1644948230,
-            "新闻晨报": 1314608344, "中国之声": 1699540307
+        "人民日报": 2803301701, "新浪新闻": 2028810631, "凤凰周刊": 1267454277,
+        "网易新闻客户端": 1974808274, "北京晨报": 1646051850,
+        "头条新闻": 1618051664, "人民网": 2286908003,
+        "财经网": 1642088277, "新京报": 1644114654, "环球时报": 1974576991,
+        "中国新闻网": 1784473157, "三联生活周刊": 1191965271, "法制晚报": 1644948230,
+        "新闻晨报": 1314608344, "中国之声": 1699540307, "中国新闻周刊": 1642512402,
+        "澎湃新闻": 5044281310, "中国日报": 1663072851, "北京青年报": 1749990115,
+        "新快报": 1652484947, "华西都市报": 1496814565, "凤凰网": 2615417307,
+        "FT中文网": 1698233740,
     }
-    for name, acc in account.items():
-        print "当前猎头：", name, acc
-        weibo_page = WeiboPage(acc)
+
+    rand_account = random.sample(account, 5)  # 从 account 中随机获取5个元素，作为一个片断返回
+
+    for acc in rand_account:
+        print "当前猎头：", acc, account[acc]
+        weibo_page = WeiboPage(account[acc])
 
         a = multiprocessing.Process(target=weibo_page.get_page, args=(1, 2))
         a.start()
+
     a.join()
     print '完成多进程'
+
+

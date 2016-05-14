@@ -29,9 +29,10 @@ class NetworkScale(models.Model):  # 网络规模表(结果事件表)
     nid = models.IntegerField(auto_created=True, primary_key=True)
     event_id = models.CharField('事件id', max_length=20)
     check_time = models.DateTimeField('检测时间')
-    corpus_dir = models.CharField('语料文本', max_length=300)
-    label_dir = models.CharField(max_length=300)
-    leader = models.CharField('核心人物', max_length=50)
+    corpus_dir = models.CharField('语料文本', max_length=300, null=True)
+    label_dir = models.CharField('label.xls的路径', max_length=300, null=True)
+    sna_dir = models.CharField('sna图的路径', max_length=300, null=True)
+    leader = models.CharField('核心人物', max_length=50, null=True)
 
     def __unicode__(self):
         return u'%s %s' % (self.event_id, self.check_time)
@@ -41,18 +42,17 @@ class NetworkScale(models.Model):  # 网络规模表(结果事件表)
 
 
 class NetworkScaleAdmin(admin.ModelAdmin):
-    list_display = ('event_id', 'check_time', 'corpus_dir', 'label_dir', 'leader')
-    list_filter = ('event_id', 'check_time', 'corpus_dir',  'label_dir', 'leader')
-    search_fields = ('event_id', 'check_time', 'corpus_dir', 'label_dir', 'leader')
+    list_display = ('event_id', 'check_time', 'corpus_dir', 'label_dir', 'sna_dir', 'leader')
+    list_filter = ('event_id', 'check_time', 'corpus_dir',  'label_dir', 'sna_dir', 'leader')
+    search_fields = ('event_id', 'check_time', 'corpus_dir', 'label_dir', 'sna_dir', 'leader')
 
 
 class Event(models.Model):  # 事件表
     event_id = models.CharField('事件id', max_length=20, primary_key=True)
     post_time = models.DateTimeField('发起时间')
-    topic = models.CharField('事件主题', max_length=100)
-    topic_words = models.CharField('主题词', max_length=300)
-    origin = models.CharField('传播源', max_length=100)
-    link = models.CharField('新闻链接', max_length=100)
+    etopic = models.CharField('事件主题', max_length=100)
+    origin = models.CharField('传播源', max_length=100, null=True)
+    link = models.CharField('新闻链接', max_length=100, null=True)
 
     def __unicode__(self):
         return u'%s %s %s' % (self.event_id, self.post_time, self.topic)
@@ -62,7 +62,7 @@ class Event(models.Model):  # 事件表
 
 
 class EventAdmin(admin.ModelAdmin):
-    search_fields = ('event_id', 'post_time', 'topic', 'topic_words', 'origin', 'link', 'content')
+    search_fields = ('event_id', 'post_time', 'topic', 'origin', 'link')
 
 
 class Headhunter(models.Model):  # 猎头信息表
@@ -89,7 +89,7 @@ class HeadhunterAdmin(admin.ModelAdmin):
     search_fields = ('user_id', 'user_name', 'vip_state', 'location')
 
 
-class Participate(models.Model):  # 用户事件关系表
+class Participate(models.Model):  # 参与关系表
     user_id = models.CharField('用户id', max_length=20)
     event_id = models.CharField('事件id', max_length=20)
 
@@ -105,7 +105,9 @@ class ParticipateAdmin(admin.ModelAdmin):
 class Content(models.Model):
     blog_id = models.CharField('博文id', max_length=20, primary_key=True)
     post_time = models.DateTimeField('博文发表时间',null=True)
-    event_id = models.CharField('事件id', max_length=20)
+    event_id = models.CharField('事件id', max_length=20, null=True)
+    topic = models.CharField('[]里的博文主题', max_length=100, null=True)
+    topic_words = models.CharField('主题关键词', max_length=50, null= True)
     content = models.TextField('事件内容')
     keywords = models.TextField('事件关键词',null=True)
 

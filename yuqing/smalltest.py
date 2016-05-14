@@ -17,21 +17,33 @@ import xlrd
 #     new_file.write(i)
 #     print i
 
-event = '魏则西之死'
-re.compile(event)
-path_list = []
-for root, dir, file in os.walk('../documents/topic1'):
-        if "label_link.xls" in file:
-            path = os.path.join(root,'label_link.xls')
-            path_list.append(path)
+# event = '魏则西之死'
+# re.compile(event)
+# path_list = []
+# for root, dir, file in os.walk('../documents/topic1'):
+#         if "label_link.xls" in file:
+#             path = os.path.join(root,'label_link.xls')
+#             path_list.append(path)
+#
+# for i in path_list:
+#     a = re.search(event,i)
+#     if a is not None:
+#         print i
+#
+# print BASE_DIR
+# file_name = BASE_DIR+'/network/result/new_label_link.xls'
+# data = xlrd.open_workbook(file_name)
+# sheet1 = data.sheet_by_index(0)
+# print sheet1.nrows
 
-for i in path_list:
-    a = re.search(event,i)
-    if a is not None:
-        print i
+# a=({'topic':'aaa'},{'topic':'aaa'})
+# for i in a:
+#     print i['topic']
 
-print BASE_DIR
-file_name = BASE_DIR+'/network/result/new_label_link.xls'
-data = xlrd.open_workbook(file_name)
-sheet1 = data.sheet_by_index(0)
-print sheet1.nrows
+import datetime
+a=datetime.datetime.now()
+date = datetime.datetime.date(a)
+time = datetime.datetime.replace(a,minute=0,second=0,microsecond=0)
+print time
+a=()
+print len(a),type(a)

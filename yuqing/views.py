@@ -4,7 +4,6 @@ from django import forms
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from yuqing.jsondump import *
-from yqproject.settings import *
 from yuqing.main_run import *
 from crawler.class_event import *
 
@@ -28,63 +27,76 @@ def homepage(request):
     # data = [{'a':'aaa'},{'b':'bbb'}]
     return render_to_response('index.html', {'data': data})
 
+
 class SearchForm(forms.Form):
     input_words = forms.CharField(max_length=100)
 
+
 def network(request):
     if request.method == 'POST':
-        file = request.POST['file']
-        print file
-    # pic =  DOC_DIR+'/topic/广东一口腔科退休医生被砍30多刀 抢救无效去世[蜡烛]/2016-05-07 15:30:59/SNA.png'
-    event_id='topicM_DuqkMjPvo'
-    event = Event().get_topic_by_id(event_id)
-    result = dump_force()
-    scale = result[2]
-    node_data = result[0]
-    edge_data = result[1]
-    leader = result[3]
-    return render(request, 'network.html', {'scale': scale, 'node_data': node_data, 'edge_data': edge_data,
-                                            'event':event['topic'],'leader':leader})
+        event_id = request.POST['event_id']
+        ctime = request.POST['ctime']
+        event = Event().get_topic(event_id)  # topic
+        result = dump_force(event_id, ctime)
+        scale = result[2]
+        node_data = result[0]
+        edge_data = result[1]
+        leader = result[3]
+        return render(request, 'network.html', {'scale': scale, 'node_data': node_data, 'edge_data': edge_data,
+                                                'event': event['etopic'], 'leader': leader})
+
+    else:
+        return HttpResponseRedirect('/linechart/')
+
 
 def line_chart(request):
-    event_id =''
+    eid_tuple = ()
     if request.method == 'POST':
         sf = SearchForm(request.POST)
-        print 'bbb',request.POST
+        print 'bbb', request.POST
         if sf.is_valid():
             search_words = sf.cleaned_data['input_words']
-            event_id = Event().search_topic(search_words)
+            eid_tuple = Event().search_topic(search_words)  # ({eid,etp},{})
 
         else:
             print 'invalid form'
 
-    if event_id == '000':
+    if len(eid_tuple) == 0:
         return render_to_response('error.html')
 
+    if len(eid_tuple) > 1:
+        event_list = []
+        for i in eid_tuple:
+            event_list.append(i)
+        return render(request, 'list.html', {'event_list': event_list})
+
     else:
+        event_id = eid_tuple[0]['event_id']
         inc = Increment()
-        event_id='topicM_DuqkMjPvo'
         rows = inc.get_data(event_id)
-        event = Event().get_topic_by_id(event_id)
-        topic_words = Content().get_topic_words(event_id)
-        # print topic_words
+        event = Event().get_topic(event_id)
+        topic_words = Content().get_keywords(event_id)
         cmt = inc.get_comment(event_id)
         rpt = inc.get_repost(event_id)
         lik = inc.get_like(event_id)
-        cnt = Content().get_main_content(event_id)
+        cnt = Content().get_content(event_id)
         print 'eve', event_id, event
         xaxis = str(inc.time_list)
         yaxis = str(inc.scale_rate)
         seris_data = str(inc.scale_rate)
-        if len(rows) ==0:
-            # return HttpResponseRedirect('/linechart/')
-            return render(request,'lineChart.html',{'default':True,'event':event['topic'],'topic_words':topic_words['keywords'],
-                                                    'cmt':cmt['comment_num'],'rpt':rpt['repost_num'],'lik':lik['like_num'],'cnt':cnt['content']})
-        old_file = open(BASE_DIR + '/static/scripts/lineChart.js', 'rw')
-        new_file = open(BASE_DIR + '/static/scripts/line_chart.js', 'w+')
-        a = old_file.readlines()
-        a[40] = a[40].replace('xaxis', xaxis)
-        a[71] = a[71].replace('seris_data', seris_data)
-        for i in a:
-            new_file.write(i)
-        return render(request, 'lineChart.html',{'default':False})
+        if len(rows) == 0:
+            default = True
+
+        else:
+            default = False
+            old_file = open(BASE_DIR + '/static/scripts/lineChart.js', 'rw')
+            new_file = open(BASE_DIR + '/static/scripts/line_chart.js', 'w+')
+            rw = old_file.readlines()
+            rw[40] = rw[40].replace('xaxis', xaxis)
+            rw[71] = rw[71].replace('seris_data', seris_data)
+            for i in rw:
+                new_file.write(i)
+        return render(request, 'lineChart.html',
+                      {'default': default, 'event': event['etopic'], 'topic_words': topic_words['keywords'],
+                       'cmt': cmt['comment_num'], 'rpt': rpt['repost_num'], 'lik': lik['like_num'],
+                       'cnt': cnt['content']})

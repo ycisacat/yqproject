@@ -59,33 +59,7 @@ class Increment(Database):
             print '数据', self.scale_rate
             return rows
 
-    def get_comment1(self, rows):
-        """计算评论增量,返回评论数据列表"""
-        for i in range(len(rows) - 1):  # i begins from 0
-            delta_comment = rows[i + 1]['comment_num'] - rows[i]['comment_num']
-            delta_time = rows[i+1]['post_time']-rows[i]['post_time']
-            comment_rate = delta_comment/delta_time
-            self.comment_rate.append(comment_rate)
-            self.comment_list.append(delta_comment)
-            print self.comment_list
 
-        return True
-
-    def get_repost1(self, rows):
-        """计算转发增量,返回转发数据列表"""
-        for i in range(len(rows) - 1):
-            delta_repost = rows[i + 1]['repost_num'] - rows[i]['repost_num']
-            self.repost_list.append(delta_repost)
-            print self.repost_list
-        return True
-
-    def get_like1(self, rows):
-        """计算点赞增量,返回点赞数据列表"""
-        for i in range(len(rows) - 1):
-            delta_like = rows[i + 1]['like_num'] - rows[i]['like_num']
-            self.like_list.append(delta_like)
-            print self.like_list
-        return True
 
     def get_comment(self,eid):
         with self.conn:
@@ -122,3 +96,31 @@ class Increment(Database):
             else:
                 rows={'like_num':'432'}
                 return rows
+
+    #   def get_comment1(self, rows):
+    #     """计算评论增量,返回评论数据列表"""
+    #     for i in range(len(rows) - 1):  # i begins from 0
+    #         delta_comment = rows[i + 1]['comment_num'] - rows[i]['comment_num']
+    #         delta_time = rows[i+1]['post_time']-rows[i]['post_time']
+    #         comment_rate = delta_comment/delta_time
+    #         self.comment_rate.append(comment_rate)
+    #         self.comment_list.append(delta_comment)
+    #         print self.comment_list
+    #
+    #     return True
+    #
+    # def get_repost1(self, rows):
+    #     """计算转发增量,返回转发数据列表"""
+    #     for i in range(len(rows) - 1):
+    #         delta_repost = rows[i + 1]['repost_num'] - rows[i]['repost_num']
+    #         self.repost_list.append(delta_repost)
+    #         print self.repost_list
+    #     return True
+    #
+    # def get_like1(self, rows):
+    #     """计算点赞增量,返回点赞数据列表"""
+    #     for i in range(len(rows) - 1):
+    #         delta_like = rows[i + 1]['like_num'] - rows[i]['like_num']
+    #         self.like_list.append(delta_like)
+    #         print self.like_list
+    #     return True

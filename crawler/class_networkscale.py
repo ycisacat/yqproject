@@ -38,7 +38,7 @@ class NetworkScale(Database):
             cur.execute(sql)
             rows = cur.fetchall()
             if len(rows) == 0:
-                default = BASE_DIR+'/network/result/new_label_link.xls'
+                default ='/network/result/new_label_link.xls'
                 return {'label_dir':default}
             else:
                 return rows[0]

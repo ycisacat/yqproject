@@ -59,7 +59,7 @@
         var myChart = echarts.init(document.getElementById('lineChart'));
 		myChart.setOption(option);
         myChart.on('click', function (params) {
-            window.open({% url "network" %});//+ encodeURIComponent(params.name));
+            window.open('/network/'+ {{ event_id }}+'/'+encodeURIComponent(params.name));
         });
         var more_icon=document.getElementById('more-icon');
 		var more_list=document.getElementById('more-list');

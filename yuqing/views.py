@@ -32,34 +32,35 @@ class SearchForm(forms.Form):
     input_words = forms.CharField(max_length=100)
 
 
-def network(request):
-    if request.method == 'POST':
-        event_id = request.POST['event_id']
-        ctime = request.POST['ctime']
-        event = Event().get_topic(event_id)  # topic
-        result = dump_force(event_id, ctime)
-        scale = result[2]
-        node_data = result[0]
-        edge_data = result[1]
-        leader = result[3]
-        return render(request, 'network.html', {'scale': scale, 'node_data': node_data, 'edge_data': edge_data,
-                                                'event': event['etopic'], 'leader': leader})
+def network(request, event_id, ctime):
+    # if request.method == 'POST':
+    #     event_id = request.POST['event_id']
+    #     ctime = request.POST['ctime']
+    event = Event().get_topic(event_id)  # topic
+    result = dump_force(event_id, ctime)
+    scale = result[2]
+    node_data = result[0]
+    edge_data = result[1]
+    leader = result[3]
+    return render(request, 'network.html', {'scale': scale, 'node_data': node_data, 'edge_data': edge_data,
+                                            'event': event['etopic'], 'leader': leader})
 
-    else:
-        return HttpResponseRedirect('/linechart/')
+    # else:
+    #     return HttpResponseRedirect('/linechart/')
 
 
-def line_chart(request):
+def line_chart(request, topic=''):
     eid_tuple = ()
     if request.method == 'POST':
         sf = SearchForm(request.POST)
-        print 'bbb', request.POST
         if sf.is_valid():
             search_words = sf.cleaned_data['input_words']
-            eid_tuple = Event().search_topic(search_words)  # ({eid,etp},{})
+            eid_tuple = Event().search_vague_topic(search_words)  # ({eid,etp},{})
 
         else:
             print 'invalid form'
+    else :
+        eid_tuple = Event().search_exact_topic(topic)
 
     if len(eid_tuple) == 0:
         return render_to_response('error.html')
@@ -97,6 +98,6 @@ def line_chart(request):
             for i in rw:
                 new_file.write(i)
         return render(request, 'lineChart.html',
-                      {'default': default, 'event': event['etopic'], 'topic_words': topic_words['keywords'],
+                      {'default': default, 'event_id':event_id, 'event': event['etopic'], 'topic_words': topic_words['keywords'],
                        'cmt': cmt['comment_num'], 'rpt': rpt['repost_num'], 'lik': lik['like_num'],
                        'cnt': cnt['content']})

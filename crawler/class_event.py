@@ -31,7 +31,24 @@ class Event(Database):
     #         else:
     #             return True
 
-    def search_topic(self, topic):
+    def search_exact_topic(self,topic):
+        """
+        用于前端搜索框,正则匹配主题,选出对应事件的eid
+        :param topic:
+        :return:({event_id,etopic},{},...)
+        """
+        with self.conn:
+            cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
+            sql = "SELECT DISTINCT event_id,etopic FROM event WHERE etopic ='%s'" % topic
+            cur.execute(sql)
+            rows = cur.fetchall()
+            if len(rows) == 0:
+                rows = ()
+                return rows
+            else:
+                return rows
+
+    def search_vague_topic(self, topic):
         """
         用于前端搜索框,正则匹配主题,选出对应事件的eid
         :param topic:

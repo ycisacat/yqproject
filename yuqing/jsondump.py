@@ -64,7 +64,7 @@ def dump_force(event_id,ctime='12:00'):
     node_list = []
     edge_list = []
     dir = NetworkScale().get_label(event_id,ctime)
-    file_name = DOC_DIR + '/' + dir['label_dir'].encode('utf-8')
+    file_name = BASE_DIR + '/' + dir['label_dir'].encode('utf-8')
     print file_name
     # file_name = BASE_DIR+'/network/result/new_label_link.xls'
     data = xlrd.open_workbook(file_name)

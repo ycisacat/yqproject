@@ -15,11 +15,15 @@ class Headhunter(Database):
         """
         with self.conn:
             cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-            sql = "SELECT DISTINCT user_id, user_name, fans_num, follow_num FROM headhunter WHERE user_name = '%s'" % name
+            sql = "SELECT DISTINCT user_name, fans_num, follow_num, profile FROM headhunter WHERE user_name = '%s'" % name
             cur.execute(sql)
             rows = cur.fetchall()
             if len(rows) != 0:
-                return rows[0]
+                fans_num = rows[0]['fans_num']
+                follow_num = rows[0]['follow_num']
+                profile = rows[0]['profile']
+                info = "粉丝数:"+str(fans_num)+",关注数:"+str(follow_num)+'\n'+'简介:'+str(profile)
+                return info
             else:
-                rows={'user_id':'000','user_name':name,'fans_num':232,'follow_num':678885}
-                return rows
+                info = "粉丝数:23879,关注数:23"
+                return info

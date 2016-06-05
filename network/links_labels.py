@@ -43,9 +43,10 @@ def walk_path(root_dir):
         if "label_link.xls" in files:  # 若存在该excel表 表示已分析过 跳过该文件夹
             continue
         for f in files:
-            if f.startswith('.'):  # 排除隐藏文件
-                continue
-            path_tuple_list.append((root, os.path.join(root, f)))
+            # if f.startswith('.'):  # 排除隐藏文件
+            #     continue
+            if f.startswith('uid'):
+                path_tuple_list.append((root, os.path.join(root, f)))
     return path_tuple_list
 
 
@@ -79,21 +80,31 @@ def load_data_old(file_name):
     line = file1.readline().decode('utf-8')
     while line:
         blog_road = BlogRoad()
-        # 存储首发博文ID
+        # 存储首发博文ID 1
         blog_road.blog_id = line.strip()
-        # 存储博文发布时间
+        # 存储博文发布时间 2
         line = file1.readline().decode('utf-8')
         blog_road.publish_time = line.strip()
-        # 存储博文内容
+        # pass 3
+        line = file1.readline()
+        # 存储博文内容 4
         line = file1.readline().decode('utf-8')
         blog_road.blog_content = line.strip()
-        # 存储该博文的发布者的ID
+        # pass 5
+        line =file1.readline()
+        # 存储该博文的发布者的ID 6
         line = file1.readline().decode('utf-8')
         blog_road.publisher_id = line.strip()
-        # 存储博文的发布者的用户名
+        # 存储博文的发布者的用户名 7
         line = file1.readline().decode('utf-8')
         blog_road.publisher_name = line.strip()
-        # pass
+        # pass 8
+        file1.readline()
+        # pass 9
+        file1.readline()
+        # pass 10
+        file1.readline()
+        # pass 11
         file1.readline()
         # 存储该博文的转发路径
         line = file1.readline().decode('utf-8')
@@ -140,39 +151,51 @@ def link_label(blog_road_list):
     :param blog_road_list: BlogRoad 列表
     :return: 用户名列表, 用户-用户-权值 三元组
     """
-    try:
-        label_list = []  # 存储用户名列表
-        link_list = []  # 用户-用户-权值 列表
-        for blog_road in blog_road_list:
-            if blog_road.publisher_name not in label_list:
-                label_list.append(blog_road.publisher_name)
-            first_sy = label_list.index(blog_road.publisher_name)  # 发布者用户名的ID
-            pattern_name = re.compile(u'@(.*?)?[：:]')  # 匹配转发路径中出现的用户名
-            for road in blog_road.road_list:
-                name_list = re.findall(pattern_name, road)
-                if name_list.__len__() > 1:
-                    if name_list[0] not in label_list:
-                        label_list.append(name_list[0])
-                    if name_list[1] not in label_list:
-                        label_list.append(name_list[1])
-                    link_list.append([label_list.index(name_list[0]), label_list.index(name_list[1]), 1])
-                else:
-                    if name_list[0] not in label_list:
-                        label_list.append(name_list[0])
-                    link_list.append([label_list.index(name_list[0]), first_sy, 1])
-    except IndexError:
-        pass
+    # try:
+    label_list = []  # 存储用户名列表
+    link_list = []  # 用户-用户-权值 列表
+    for blog_road in blog_road_list:
+        if blog_road.publisher_name not in label_list:
+            label_list.append(blog_road.publisher_name)
+        first_sy = label_list.index(blog_road.publisher_name)  # 发布者用户名的ID
+        pattern_name = re.compile(u'@(.*?)?[：:]')  # 匹配转发路径中出现的用户名
+        for road in blog_road.road_list:
+            name_list = re.findall(pattern_name, road)
+            if name_list.__len__() > 1:
+                if name_list[0] not in label_list:
+                    label_list.append(name_list[0])
+                if name_list[1] not in label_list:
+                    label_list.append(name_list[1])
+                link_list.append([label_list.index(name_list[0]), label_list.index(name_list[1]), 1])
+            else:
+
+                if name_list[0] not in label_list:
+                    label_list.append(name_list[0])
+                link_list.append([label_list.index(name_list[0]), first_sy, 1])
+
+    # except IndexError:
+    #     pass
     return link_list, label_list
 
 
 def create_xls():
     paths = walk_path('../documents/topic')
+    print paths
     for path in paths:
-        blog_roads = load_data_old(path[1])
-        links, labels = link_label(blog_roads)
+        print path[1],
+        try:
+            blog_roads = load_data_old(path[1])
+            links, labels = link_label(blog_roads)
+        except:
+            print "这个txt的格式有问题(才良的锅)"
         # for l in labels:
         #     print labels.index(l), l
         # for l in links:
         #     print l
-        print path[1], 'done'
+        print 'done'
         write_data_old(path[0]+'/label_link.xls', labels, links)
+    return
+
+if __name__ == '__main__':
+    create_xls()
+

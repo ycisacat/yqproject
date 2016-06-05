@@ -220,3 +220,33 @@ padding-top: 40px;
 	height: 500px;
 	margin: 0 auto;
 }
+#tooltip
+			{
+			position:absolute;
+			border:1px solid #333;
+			width:200px;
+			height:200px;
+			background:#fff;
+			padding:1px;
+			color:red;
+			display:none;
+			}
+			h2
+			{
+				color:black;
+				font-size: 26px;
+			}
+			p
+			{
+				color:blue;
+				font-size: 16px;
+			}
+			li
+			{
+				list-style: none;
+			}
+			a
+			{
+				color:black;
+
+			}

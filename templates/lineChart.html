@@ -59,12 +59,22 @@
         var myChart = echarts.init(document.getElementById('lineChart'));
 		myChart.setOption(option);
         myChart.on('click', function (params) {
-            window.open('/network/'+ {{ event_id }}+'/'+encodeURIComponent(params.name));
-        });
+                if(params.name=="最大值"||params.name=="最小值"){
+                    var index=0;
+                    var mValue=params.value;
+                    for(var i=0;i<24;i++){
+                        if(option.series[0].data[i]==mValue){
+                            index=i;
+                            break;
+                        }
+                    }
+                    window.open('/network/'+ '{{ event_id }}'+'/' + encodeURIComponent(option.xAxis[0].data[index]));
+                }else {
+                    window.open('/network/'+ '{{ event_id }}'+'/' + encodeURIComponent(params.name));
+                }
+});
         var more_icon=document.getElementById('more-icon');
 		var more_list=document.getElementById('more-list');
-		// var more_lis=more_list.getElementsByTagName('li');
-		// var more_li1=more_lis[0];
 		more_icon.onclick=function(){
 			
 			if(more_list.className!='hide'){
@@ -72,7 +82,7 @@
 			}else{
 				more_list.className='show';
 			}
-		}
+		};
 		// more_list.onmouseout=function(){
 		// 	more_list.className='hide';
 		// }

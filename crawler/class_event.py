@@ -30,6 +30,23 @@ class Event(Database):
     #             return eid
     #         else:
     #             return True
+    def delete_event(self,eid):
+        """
+        爬虫,删除不是热点的事件
+        :param eid:
+        :return:
+        """
+        with self.conn:
+            cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
+            check = "SELECT * FROM event WHERE event_id='%s'" % eid
+            cur.execute(check)
+            rows = cur.fetchall()
+            if len(rows) == 0:
+                pass
+            else:
+                delete = "DELETE FROM event WHERE event_id='%s'" % eid
+                cur.execute(delete)
+        return True
 
     def search_exact_topic(self,topic):
         """
@@ -72,12 +89,15 @@ class Event(Database):
         """
         with self.conn:
             cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
+            # sql = "SELECT DISTINCT etopic, MONTH( post_time ) AS month, DAY( post_time ) AS day "\
+            #         "FROM (SELECT * FROM event WHERE post_time IS NOT NULL GROUP BY DATE(post_time)"\
+            #        "ORDER BY post_time DESC LIMIT 12) AS temp GROUP BY etopic ORDER BY post_time ASC  LIMIT 12"
             sql = "SELECT DISTINCT etopic, MONTH( post_time ) AS month, DAY( post_time ) AS day "\
-                    "FROM (SELECT * FROM event WHERE post_time IS NOT NULL GROUP BY DATE(post_time)"\
-                   "ORDER BY post_time DESC LIMIT 12) AS temp GROUP BY etopic ORDER BY post_time ASC  LIMIT 12"
+                  "FROM (select * from event natural join networkscale WHERE label_dir !='None' limit 12) as temp"\
+                    " GROUP BY DATE(post_time) ORDER BY post_time ASC  LIMIT 12"
             cur.execute(sql)
             rows = cur.fetchall() #({},{}),({'topic': u'111', 'day': 25L, 'month': 4L},)
-            print rows
+            # print 'get timeline',rows
             if len(rows) == 0:
                 default = False
                 return default

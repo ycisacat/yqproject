@@ -5,6 +5,10 @@
 	<title>网络图</title>
     {% load staticfiles %}
 	<link rel="stylesheet" href="{% static 'styles/network.css' %}">
+<style>
+
+
+</style>
 </head>
 <body>
     <div id="container">
@@ -31,12 +35,34 @@
                     <p><span>参与规模: </span>{{ scale }}</p>
                     <span class="con">
                         <h4>关键人物:</h4>
+                    <form id="form1" runat="server">
+                    <div class="scrollNews" >
+                    <ul>
                         {% for i in leader %}
-                        <p>{{ i }}</p>
-                        {% endfor %}
 
-                        <br><br><br>
-                        <a class="pic" href="{{ pic }}"><img src="{% static 'images/SNA.png' %}" height="200" width="200"></a>
+                        <li><p><a href="#" class="tooltip" title="{{ i }}">{{ i }}</a></p></li>
+
+                        {% endfor %}
+{#                    <li><a href="#" class="tooltip" title="甜美宽松毛衣今秋一定红.">甜美宽松毛衣.</a></li>#}
+{#                    <li><a href="#" class="tooltip" title="秋装百搭小马甲不到50元.">秋装百搭小马.</a></li>#}
+                    </ul>
+                    </div>
+                    </form>
+{#                        <br><br><br>#}
+{# <form id="form1" runat="server">#}
+{#<div class="scrollNews" >#}
+{#<ul>#}
+{#<li><a href="#" class="tooltip" title="甜美宽松毛衣今秋一定红.">甜美宽松毛衣.</a></li>#}
+{#<li><a href="#" class="tooltip" title="秋装百搭小马甲不到50元.">秋装百搭小马.</a></li>#}
+{#<li><a href="#" class="tooltip" title="修身韩版小西装万人疯抢.">修身韩版小西装</a></li>#}
+{#<li><a href="#" class="tooltip" title="夏末雪纺店主含泪大甩卖.">夏末雪纺</a></li>#}
+{#<li><a href="#" class="tooltip" title="瑞丽都疯狂推荐的秋装.">瑞丽都疯狂</a></li>#}
+{#<li><a href="#" class="tooltip" title="48元长款针织小开衫卖疯啦.">48元长款针织</a></li>#}
+{#<li><a href="#" class="tooltip" title="长袖雪纺衫单穿内搭都超美.">长袖雪纺衫超美</a></li>#}
+{#</ul>#}
+{#</div>#}
+{#</form>#}
+                        <a class="pic" href=" "><img src="/static/{{ pic_dir }}" height="200" width="200"></a>
 
                     </span>
 
@@ -53,6 +79,46 @@
 	<script type="text/javascript" src="{% static 'scripts/vis.js' %}"></script>
 {#	<script type="text/javascript" src="{% static 'scripts/new.js' %}"></script>#}
     <script type="text/javascript" src={% static "scripts/sidebarChange.js" %}></script>
+    <script language="javascript" type="text/javascript">
+    $(function () {
+var x = 20; //tooltip偏移鼠标的横坐标
+var y = 20; //tooptip偏移鼠标的纵坐标
+var myTitle;
+$("a.tooltip").mouseover(function (e) {
+
+	for(var i=0;i<($("a").length);i++){
+	$("a")[i].index=i;
+	}
+
+console.log($("a")[0].index);
+var contents=
+[
+    {% for i in info %}
+    '{{ i }}',
+    {% endfor %}
+
+];
+console.log(this.index);
+myTitle = '<h2>'+this.title+'<h2>';
+myContent='<p>'+contents[this.index]+'</p>';
+this.title = "";
+var tooltip = "<div id='tooltip'>" + myTitle +myContent+ "</div>";
+$(".scrollNews").append(tooltip);
+$("#tooltip").css({
+"top": (e.pageY + y) + "px",
+"left": (e.pageX + x) + "px"
+}).show("fast");
+}).mouseout(function () {
+this.title = myTitle;
+$("#tooltip").remove();
+}).mousemove(function (e) {
+$("#tooltip").css({
+"top": (e.pageY + y) + "px",
+"left": (e.pageX + x) + "px"
+});
+});
+});
+    </script>
     <script>
         var color = 'gray';
 	    var len = undefined;

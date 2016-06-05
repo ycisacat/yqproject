@@ -111,6 +111,7 @@ class Content(models.Model):
     content = models.TextField('事件内容')
     keywords = models.TextField('事件关键词',null=True)
 
+
     class Meta:
         db_table = 'content'
 

@@ -46,30 +46,37 @@ def main_network():
     # for node in MG.node_list:
     #     print node.node_index, node.label, node.value, node.rank, node.group, node.is_topK
 
+
     path_list = []
     dir_list = []
+    pic_dir_list = []
     create_xls()
+    print "*************"
     for root, dir, file in os.walk('../documents/topic'):
         if "label_link.xls" in file:
             dir_list.append(root)
+            pic_dir = root.replace('documents','static/sna')
+            pic_dir_list.append(pic_dir)
             path = os.path.join(root,'label_link.xls')
             path_list.append(path)
+    # print path_list[0]
     for i in range(len(path_list)):
-        try:
+        # print 'pc',pic_dir_list[i]
+            print path_list[i],
             labels = dict(load_data(path_list[i], 0))  # 标签列表
             links = load_data(path_list[i], 1)  # 节点连接列表
-            print path_list[i]
+            if links.__len__() == 0:
+                print "分析的路径为空,跳过"
+                continue
+            # print path_list[i]
+
             MG = MakeGraph(links, labels)
-            DrawGraph(node_list=MG.node_list, graph=MG.graph).draw_graph(os.path.join(dir_list[i], 'SNA.png'))
+            DrawGraph(node_list=MG.node_list, graph=MG.graph).draw_graph(os.path.join(pic_dir_list[i], 'SNA.png'))
             write_data(os.path.join(dir_list[i], 'new_label_link.xls'), MG.node_list, links)
-            print "节点索引 节点标签名 节点pageRank值 节点排名 是否为topK节点"
-            for node in MG.node_list:
-                print node.node_index, node.label, node.value, node.rank, node.group, node.is_topK
-        except igraph._igraph.InternalError:
-            continue
-        except KeyError:
-            continue
-        except IndexError:
-            continue
+            print "done"
+            # print "节点索引 节点标签名 节点pageRank值 节点排名 是否为topK节点"
+            # for node in MG.node_list:
+            #     print node.node_index, node.label, node.value, node.rank, node.group, node.is_topK
+
 
 # main_network()

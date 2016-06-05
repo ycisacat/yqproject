@@ -1,26 +1,31 @@
 # coding=utf-8
+
 import multiprocessing
 import threading
 import datetime
-
-__author__ = 'gu'
-
 import time
 import random
 import urllib2
 from MoblieWeibo import *
 from yqproject.settings import *
 from crawler.class_save_data import *
+
+__author__ = 'gu'
+
 """
+5.17测试完毕
 爬取用户首页信息:用户名 id 微博数 关注数 粉丝数
 爬取用户资料
 爬取用户标签
+
 """
 
 
 class Sina():
+
     """
     本类爬取新浪的用户的首页信息和资料页的信息
+    可以传入的参数为 ： /n/%E4%BB%99%E5%89%91%E6%8E%A2%E4%BA%91?vt=4、 /u/人民日报、 id（数字或者引文）
     """
 
     def __init__(self, uid):
@@ -40,11 +45,12 @@ class Sina():
         index_url = "http://weibo.cn/" + self.uid  # 猎头的首页
         req = urllib2.Request(url=index_url, headers=self.header)
         self.homepage = urllib2.urlopen(req).read()
-
+        # print self.homepage
         # 资料页
         info_url = 'http://weibo.cn/' + self.get_uid() + '/info'  # 资料页
         req = urllib2.Request(url=info_url, headers=self.header)
         self.info_page = urllib2.urlopen(req).read()
+
 
     # 以下是爬取用户的首页信息
     def get_homepage_information(self):
@@ -88,7 +94,7 @@ class Sina():
          获取用户的id
         :return: 用户id(str)
         """
-        uid_pattern = re.compile('私信</a>&nbsp;<a href="/(.*?)/info">资料')
+        uid_pattern = re.compile('私信</a>&nbsp;<a href="/(.*?)/info')
         uid = uid_pattern.findall(self.homepage)
         return uid[0]
 
@@ -241,19 +247,19 @@ class Sina():
         """
 
         try:
-            # print '用户名: ', self.get_name()
-            # print 'id: ', self.get_uid()
-            # print '微博数: ', self.get_weibo_num()
-            # print '关注数: ', self.get_follows_num()
-            # print '粉丝数: ', self.get_fans_num()
-            # print '是否大v： ', self.isbig_v()
-            # print '性别： ', self.get_sex()
-            # print '地区： ', self.get_area()
-            # print '生日： ', self.get_birthday()
-            # print '认证： ', self.get_authentication()
-            # print '认证信息： ', self.get_authentic_info()
-            # print '简介： ', self.get_brief_intro()
-            # print '用户标签:', self.get_tags()
+            print '用户名: ', self.get_name()
+            print 'id: ', self.get_uid()
+            print '微博数: ', self.get_weibo_num()
+            print '关注数: ', self.get_follows_num()
+            print '粉丝数: ', self.get_fans_num()
+            print '是否大v： ', self.isbig_v()
+            print '性别： ', self.get_sex()
+            print '地区： ', self.get_area()
+            print '生日： ', self.get_birthday()
+            print '认证： ', self.get_authentication()
+            print '认证信息： ', self.get_authentic_info()
+            print '简介： ', self.get_brief_intro()
+            print '用户标签:', self.get_tags()
 
             if os.path.exists(self.data_dir):
                 pass
@@ -284,12 +290,13 @@ class Sina():
     def hunter_account(self):
         account = {
             "人民日报": 2803301701, "新浪新闻": 2028810631, "凤凰周刊": 1267454277,
-            "网易新闻客户端": 1974808274, "北京晨报": 1646051850, "微博股票": 5578381471,
-            "头条新闻": 1618051664, "cctv5": 2993049293, "人民网": 2286908003,
-            "英国报姐": 3099016097,
-            "财经网": 1642088277, "新京报": 1644114654, "环球时报": 1974576991,
+            "网易新闻客户端": 1974808274, "北京晨报": 1646051850, "头条新闻": 1618051664,
+            "人民网": 2286908003, "财经网": 1642088277, "新京报": 1644114654,
             "中国新闻网": 1784473157, "三联生活周刊": 1191965271, "法制晚报": 1644948230,
-            "新闻晨报": 1314608344, "中国之声": 1699540307
+            "新闻晨报": 1314608344, "中国之声": 1699540307, "中国新闻周刊": 1642512402,
+            "澎湃新闻": 5044281310, "中国日报": 1663072851, "北京青年报": 1749990115,
+            "新快报": 1652484947, "华西都市报": 1496814565, "凤凰网": 2615417307,
+            "FT中文网": 1698233740, "环球时报": 1974576991
         }
         return account
 
@@ -308,14 +315,17 @@ def count_time():
     other_style_time = now.strftime("%Y-%m-%d %H:%M:%S")
     return other_style_time
 
-
-if __name__ == '__main__':
+def main_headunter():
+# if __name__ == '__main__':
     MoblieWeibo().login('meilanyiyou419@163.com', 'aaa333')
     print '正在模拟登录,开始时间: ', count_time()
     sina = Sina('rmrb')
+    a = []
     for name, acc in sina.hunter_account().items():
         print "当前猎头：", acc, name
         a = multiprocessing.Process(target=sina.process_control, args=(str(acc),))
         a.start()
     a.join()
+    # sina = Sina('/n/仙剑探云')
+    # sina.process_control('/n/%E4%BB%99%E5%89%91%E6%8E%A2%E4%BA%91?vt=4')
     print '完成多进程,结束时间为：', count_time()

@@ -6,6 +6,9 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from yuqing.jsondump import *
 from yuqing.main_run import *
 from crawler.class_event import *
+from crawler.class_content import *
+from crawler.class_headhunter import *
+
 
 # Create your views here.
 
@@ -36,14 +39,21 @@ def network(request, event_id, ctime):
     # if request.method == 'POST':
     #     event_id = request.POST['event_id']
     #     ctime = request.POST['ctime']
+    hh= Headhunter()
     event = Event().get_topic(event_id)  # topic
     result = dump_force(event_id, ctime)
     scale = result[2]
     node_data = result[0]
     edge_data = result[1]
     leader = result[3]
+    info_list = []
+    pic_dir = result[4]
+    for i in leader:
+        info = hh.get_info(i) #{}
+        info_list.append(info)
     return render(request, 'network.html', {'scale': scale, 'node_data': node_data, 'edge_data': edge_data,
-                                            'event': event['etopic'], 'leader': leader})
+                                            'event': event['etopic'], 'leader': leader, 'info': info_list,
+                                            'pic_dir': pic_dir})
 
     # else:
     #     return HttpResponseRedirect('/linechart/')

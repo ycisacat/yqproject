@@ -44,7 +44,7 @@ class Database:
             print '数据已存入事件描述表'
         return True
 
-    def save_network_scale(self, eid, cps='未知', label='未知', sna='未知', leader='未知'):
+    def save_network_scale(self, eid, cps='None', label='None', sna='None', leader='Unknown'):
         """
         向网络规模表添加数据
         :param topic: 主题
@@ -64,60 +64,44 @@ class Database:
             print '数据已存入网络规模表'
         return True
 
-    def save_event(self, eid):
+    def save_event(self, eid, ptime, etopic, origin, link):
         """
-        从content表中取出已聚类的事件,把eid,最早发布时间,主题存入event表
-        :param eid: event_id
+        写第n次存event表的函数了,宝宝心累
+        :param eid: 事件id
+        :param ptime: 首发时间
+        :param etopic: 话题
+        :param origin: 传播源
+        :param link: 链接
         :return:
         """
+        pptime = str(ptime)
+        date = re.search('(\d+)月(\d+)日', pptime)
+        time = re.search('(\d+):(\d+)', pptime)
+        if time is not None:
+            hour = int(time.group(1))
+            minute = int(time.group(2))
+        else:
+            hour = 0
+            minute = 0
+        ptime = datetime.datetime(2016, int(date.group(1)), int(date.group(2)), hour, minute)
         with self.conn:
             cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-            sql = "SELECT DISTINCT event_id, post_time,etopic from content WHERE event_id = '%s' " \
-                  "ORDER BY post_time ASC LIMIT 1" % eid
-            insert = "into event(event_id, post_time, etopic)"
-            cur.execute(sql + insert)
-            print "数据已存入热门事件表"
+            check = "select * from event where event_id='%s'" % eid
+            cur.execute(check)
+            rows = cur.fetchall()
+            if len(rows) == 0:
+                insert = "INSERT INTO event" \
+                         "(event_id,post_time,etopic,origin,link)" \
+                         " VALUES('%s','%s','%s','%s','%s')" % \
+                         (eid, ptime, etopic, origin, link)
+                cur.execute(insert)
+                print '数据已存入网络规模表'
+            else:
+                print '数据已存在'
         return True
 
-    def update_event(self, eid, origin, link):
-        with self.conn:
-            cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-            sql = "update event SET origin='%s',link='%s' WHERE event_id ='%s'" % (origin, link, eid)
-            cur.execute(sql)
-            print "已更新热门事件表"
-        return True
 
-    # def save_event(self, eid, ptime, topic='未知', origin='未知', link='未知'):
-    #     """
-    #     向爬取微博表添加数据
-    #     :param eid: 事件id
-    #     :param ptime: 发表时间
-    #     :param topic: 事件主题
-    #     :param origin: 传播源
-    #     :param link: 新闻链接
-    #     :return:
-    #     """
-    #
-    #     pptime = str(ptime)
-    #     date = re.search('(\d+)月(\d+)日', pptime)
-    #     time = re.search('(\d+):(\d+)', pptime)
-    #     if time is not None:
-    #         hour = int(time.group(1))
-    #         minute = int(time.group(2))
-    #     else:
-    #         hour = 0
-    #         minute = 0
-    #     ptime = datetime.datetime(2016, int(date.group(1)), int(date.group(2)), hour, minute)
-    #
-    #     with self.conn:
-    #         cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-    #         insert = "REPLACE INTO event(event_id,post_time,etopic,origin,link)" \
-    #                  " VALUES('%s','%s','%s','%s','%s')" % (eid, ptime, topic, origin, link)
-    #         cur.execute(insert)
-    #         print '数据已存入爬取微博表'
-    #     return True
-
-    def save_headhunter(self, uid, name, gender='未知', bir='0000-00-00', vip='非认证用户', loc='未知', pro='未添加', tag='无',
+    def save_headhunter(self, uid, name, gender='Unknown', bir='0000-00-00', vip='Unknown', loc='Unknown', pro='Unknown', tag='Unknown',
                         fans=0, fol=0, blog=0):
         """
         向猎头信息表添加数据
@@ -157,12 +141,18 @@ class Database:
         """
         with self.conn:
             cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-            insert = "REPLACE INTO participate (user_id, event_id) VALUES('%s','%s')" % (uid, eid)
-            cur.execute(insert)
-        print "数据已存入参与关系表"
+            check1 = "select * from event where event_id='%s'" % eid
+            cur.execute(check1)
+            rows = cur.fetchall()
+            if len(rows) != 0:
+                insert = "REPLACE INTO participate (user_id, event_id) VALUES('%s','%s')" % (uid, eid)
+                cur.execute(insert)
+                print "数据已存入参与关系表"
+            else:
+                print "不是热点事件"
         return True
 
-    def save_content(self, bid, ptime, tp, tpw, cnt, kw):
+    def save_content(self, bid, eid, ptime, tp, tpw, cnt, kw):
         """
         向事件内容表添加数据
         :param bid: 博文id
@@ -187,11 +177,17 @@ class Database:
 
         with self.conn:
             cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-            check1 = "SELECT blog_id from content where blog_id='%s' or topic='%s'" % bid, tp
-            insert = "REPLACE INTO content (blog_id,post_time, topic, topic_words, content, keywords) " \
-                     "VALUES('%s','%s','%s','%s','%s','%s')" % (bid, ptime, tp, tpw, cnt, kw)
-            cur.execute(insert)
-        print "数据已存入事件内容表"
+            check = "select * from content where event_id='%s'" % eid
+            cur.execute(check)
+            rows = cur.fetchall()
+            if len(rows) == 0:
+            # check1 = "SELECT blog_id from content where blog_id='%s' or topic='%s'" % bid, tp
+                insert = "REPLACE INTO content (blog_id,post_time, event_id, topic, topic_words, content, keywords) " \
+                     "VALUES('%s','%s','%s','%s','%s','%s','%s')" % (bid, ptime, eid, tp, tpw, cnt, kw)
+                cur.execute(insert)
+                print "数据已存入事件内容表"
+            else:
+                print "数据已存在"
         return True
 
     def update_eid(self, bid, eid):
@@ -206,3 +202,56 @@ class Database:
             sql = "UPDATE content SET event_id='%s' WHERE blog_id='%s'" % (eid, bid)
             cur.execute(sql)
             print "博文按事件归类完成"
+
+    # def save_event(self, eid):
+    #     """
+    #     从content表中取出已聚类的事件,把eid,最早发布时间,主题存入event表
+    #     :param eid: event_id
+    #     :return:
+    #     """
+    #     with self.conn:
+    #         cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
+    #         sql = "SELECT DISTINCT event_id, post_time,topic from content WHERE event_id = '%s' " \
+    #               "ORDER BY post_time ASC LIMIT 1" % eid
+    #         insert = "into event(event_id, post_time, etopic)"
+    #         cur.execute(sql + insert)
+    #         print "数据已存入热门事件表"
+    #     return True
+    #
+    # def update_event(self, eid, origin, link):
+    #     with self.conn:
+    #         cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
+    #         sql = "update event SET origin='%s',link='%s' WHERE event_id ='%s'" % (origin, link, eid)
+    #         cur.execute(sql)
+    #         print "已更新热门事件表"
+    #     return True
+
+    # def save_event(self, eid, ptime, topic='未知', origin='未知', link='未知'):
+    #     """
+    #     向爬取微博表添加数据
+    #     :param eid: 事件id
+    #     :param ptime: 发表时间
+    #     :param topic: 事件主题
+    #     :param origin: 传播源
+    #     :param link: 新闻链接
+    #     :return:
+    #     """
+    #
+    #     pptime = str(ptime)
+    #     date = re.search('(\d+)月(\d+)日', pptime)
+    #     time = re.search('(\d+):(\d+)', pptime)
+    #     if time is not None:
+    #         hour = int(time.group(1))
+    #         minute = int(time.group(2))
+    #     else:
+    #         hour = 0
+    #         minute = 0
+    #     ptime = datetime.datetime(2016, int(date.group(1)), int(date.group(2)), hour, minute)
+    #
+    #     with self.conn:
+    #         cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
+    #         insert = "REPLACE INTO event(event_id,post_time,etopic,origin,link)" \
+    #                  " VALUES('%s','%s','%s','%s','%s')" % (eid, ptime, topic, origin, link)
+    #         cur.execute(insert)
+    #         print '数据已存入爬取微博表'
+    #     return True

@@ -137,8 +137,11 @@ class MakeGraph:
         graph, weights = self.__create_graph()
         self.__calculate_rank()
         self.__find_topK()
-        divide_result = graph.community_walktrap(weights=weights, steps=4).as_clustering()
-        # divide_result = graph.community_multilevel(weights=weights)
+        try:
+            divide_result = graph.community_walktrap(weights=weights, steps=4).as_clustering()
+        except igraph._igraph.InternalError:
+            graph.to_undirected()
+            divide_result = graph.community_multilevel(weights=weights)
         for index, community in enumerate(divide_result):
             for n in community:
                 self.node_list[n].group = index

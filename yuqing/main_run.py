@@ -4,8 +4,7 @@ __author__ = 'yc'
 import multiprocessing as mul
 from network.main import *
 from crawler.class_increment import *
-from crawler.crawl_weibo1 import *
-
+import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -35,6 +34,6 @@ def multi_run():
         print '完成多进程'
     except :
         print 'multiprocessing error'
-
-if __name__ == "__main__":
-    auto_run()
+#
+# if __name__ == "__main__":
+#     auto_run()

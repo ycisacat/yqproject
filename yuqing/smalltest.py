@@ -47,3 +47,29 @@ time = datetime.datetime.replace(a,minute=0,second=0,microsecond=0)
 print time
 a=()
 print len(a),type(a)
+
+a=({'a':'a b c d'},)
+for i in a:
+    # print i
+    a = i['a'].split(' ')
+    print a
+
+a='/home/yc/PycharmProjects/yqproject/topic/患癌老爸怕拖累家人留信出走女儿泪奔寻父/2016-06-04 16:09:58/new_label_lin'
+b=a.replace('topic','doo')
+print b
+leader_list = ['a','b']
+seg=','
+print seg.join(leader_list)
+
+from crawler.start_search import *
+db = Database()
+label_dir = '/topic/别传了！杨雷雷丢高考准考证是谣言！/2016-06-05 13:27:57/new_label_link.xls'
+sna_dir ='sna/topic/别传了！杨雷雷丢高考准考证是谣言！/2016-06-05 13:27:57/SNA.png'
+if os.path.exists(DOC_DIR+'/'+label_dir):
+    print 'yes'
+    leader = find_leader(label_dir)
+    db.save_network_scale('tpM_DyOMhrQ8O', 'aaa', label_dir,sna_dir, leader)
+    # db.save_increment(e_id, bid_comment,bid_forward, bid_like)
+else:
+    print 'no'
+

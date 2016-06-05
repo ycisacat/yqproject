@@ -63,10 +63,16 @@ def dump_force(event_id,ctime='12:00'):
     """
     node_list = []
     edge_list = []
-    dir = NetworkScale().get_label(event_id,ctime)
-    file_name = BASE_DIR + '/' + dir['label_dir'].encode('utf-8')
-    print file_name
-    # file_name = BASE_DIR+'/network/result/new_label_link.xls'
+    ns= NetworkScale()
+    dirs = ns.get_dirs(event_id,ctime)
+    if dirs['label_dir'] =='None':
+        file_name = BASE_DIR+'/network/result/new_label_link.xls'
+        pic_dir = 'images/SNA.png'
+    else:
+        file_name = DOC_DIR + '/' + dirs['label_dir'].encode('utf-8')
+        pic_dir = dirs['sna_dir'].encode('utf-8')
+        # print file_name
+        # file_name = BASE_DIR+'/network/result/new_label_link.xls'
     data = xlrd.open_workbook(file_name)
     sheet1 = data.sheet_by_index(0)
     sheet2 = data.sheet_by_index(1)
@@ -91,7 +97,7 @@ def dump_force(event_id,ctime='12:00'):
     edge_data = json.dumps(edge_list, separators=(',', ':'))
     # print node_data
     scale = sheet1.nrows
-    data = [node_data, edge_data, scale, leader_list]
+    data = [node_data, edge_data, scale, leader_list, pic_dir]
     return data
 
 

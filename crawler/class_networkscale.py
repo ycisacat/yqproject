@@ -7,25 +7,29 @@ class NetworkScale(Database):
     def __init__(self):
         Database.__init__(self)
 
-    def get_sna(self,eid):
-        """
-        取sna图路径,用于前端network页展示用
-        :param eid: event_id
-        :param ctime: check_time
-        :return: ({'sna_dir'},{},...) len=6
-        """
-        with self.conn:
-            cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-            sql = "SELECT DISTINCT sna_dir FROM networkscale WHERE event_id='%s' ORDER BY check_time DESC limit 6" % eid
-            cur.execute(sql)
-            rows= cur.fetchall()
-            if len(rows) == 0:
-                default = BASE_DIR+'/network/result/SNA.png'
-                return {'sna_dir':default}
-            else :
-                return rows
+    # def get_sna(self,eid,ctime):
+    #     """
+    #     取sna图路径,用于前端network页展示用
+    #     :param eid: event_id
+    #     :param ctime: check_time
+    #     :return: ({'sna_dir'},{},...) len=6
+    #     """
+    #     with self.conn:
+    #         cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
+    #         sql = "SELECT DISTINCT label_dir FROM networkscale WHERE event_id='%s' and check_time='%s'" % (eid, ctime)
+    #         cur.execute(sql)
+    #         rows = cur.fetchall()
+    #         if len(rows) ==0:
+    #             sql = "SELECT DISTINCT sna_dir FROM networkscale WHERE event_id='%s' ORDER BY check_time DESC limit 6" % eid
+    #             cur.execute(sql)
+    #             rows= cur.fetchall()
+    #         if len(rows) == 0:
+    #             default = BASE_DIR+'/network/result/SNA.png'
+    #             return {'sna_dir':default}
+    #         else :
+    #             return rows
 
-    def get_label(self,eid, ctime):
+    def get_dirs(self,eid, ctime):
         """
         取label.xls路径,用于分析出网络图
         :param eid: event_id
@@ -34,12 +38,17 @@ class NetworkScale(Database):
         """
         with self.conn:
             cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-            sql = "SELECT DISTINCT label_dir FROM networkscale WHERE event_id='%s' and check_time='%s'" % (eid, ctime)
+            sql = "SELECT DISTINCT label_dir, sna_dir FROM networkscale WHERE event_id='%s' and check_time='%s'" % (eid, ctime)
             cur.execute(sql)
             rows = cur.fetchall()
             if len(rows) == 0:
-                default ='/network/result/new_label_link.xls'
-                return {'label_dir':default}
+                sql = "SELECT DISTINCT label_dir, sna_dir FROM networkscale WHERE event_id='%s' ORDER BY check_time DESC limit 1" % eid
+                cur.execute(sql)
+                rows = cur.fetchall()
+            if len(rows) == 0:
+                default_label ='/network/result/new_label_link.xls'
+                default_sna = 'images/SNA.png'
+                return {'label_dir':default_label,'sna_dir':default_sna}
             else:
                 return rows[0]
 

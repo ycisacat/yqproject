@@ -1,6 +1,8 @@
 # coding=utf-8
 __author__ = 'gu'
-from crawl_weibo import *
+import sys
+sys.path.append('home/yc/PycharmProjects/yqproject/yqproject/settings.py')
+# from crawl_weibo import *
 from detection import *
 from search_topic import *
 """
@@ -16,6 +18,7 @@ def run():
     detection()  # 检测新事件，进而更新话题列表
     print '开始搜索'
     muL_ss()  # 对新的话题列表进行重新分类，并开始搜索
+    main_network()
 
 def main_weibo():
     """

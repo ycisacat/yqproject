@@ -6,24 +6,34 @@ from candidate_words import *
 
 
 class BetweenCentrality:
+    """
+    :purpose:求博文词语间的点居间度
+    """
 
     def __init__(self):
+        """
+        : varible:  bc_dict   词语-点居间度字典
+        """
         self.G = nx.Graph()
-        self.bcdict = {}
-        self.nword = {}
+        self.bc_dict = {}
+        self.n_word = {}
 
     def codes_betweeness_centarlity(self, string_data):
-            candidate_words_dict, nwword = CandidateWords().get_candidate_list(string_data)
-            nwword_words=nwword.values()
-            length = len(nwword_words)
+            """
+            :param string_data:
+            :return: bc_dict
+            """
+            candidate_words_dict, nw_word, important_words = CandidateWords().get_candidate_list(string_data)
+            nw_word_words = nw_word.values()
+            length = len(nw_word_words)
             for i in range(length):
                 self.G.add_node(i)
-            E = Semantic_similarity().similarity_network_edges(string_data)
+            E = SemanticSimilarity().similarity_network_edges(string_data)
             self.G.add_edges_from(E)
             vd= nx.betweenness_centrality(self.G, k=None, normalized=True, weight=None, endpoints=False, seed=None )
             for i in range(length):
-                self.bcdict[nwword_words[i]] = vd[i]
+                self.bc_dict[nw_word_words[i]] = vd[i]
             for i in range(length):
-                self.nword[i] = nwword_words[i]
-            return self.bcdict  #type is dict
+                self.n_word[i] = nw_word_words[i]
+            return self.bc_dict
 

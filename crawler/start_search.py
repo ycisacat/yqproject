@@ -41,6 +41,7 @@ def muL_ss():
     for j in range(len(threads)):
         threads[j].join()
 
+
 def start_search(bid, tbw_list):
     """
     经过聚类后便可以开始搜索， 进行st().search_topic搜索，生成文件夹，如果不是热点的话题，便删除文件夹
@@ -68,15 +69,15 @@ def start_search(bid, tbw_list):
 
         # total_result_list = [[博文id,博文时间,标题,博文,关键词,首发者的id,首发者的名字,点赞,转发,评论,origin], ]
         for com_index in range(len(total_result_list)):
-            for com in total_result_list[com_index]:
-                txt_file.write(str(com) + '\n')
+            # for com in total_result_list[com_index]:
+            #     txt_file.write(str(com) + '\n')
 
             # total_reason_list = [[古阿陌@洗洗睡@人民日报, 南方报@人民日报, yutsfa@人民日报 ], ]
             for reason in total_reason_list[com_index]:
                 print "转发理由：", reason
                 txt_file.write(str(reason) + '\n')
-            txt_file.write('\n')
-        txt_file.write('\n\n\n--------------------\n')
+            # txt_file.write('\n')
+        # txt_file.write('\n\n\n--------------------\n')
 
         # lfc_all_num = [该话题的点赞规模,该话题的转发规模,该话题的评论规模]
         print '*******************************'
@@ -90,9 +91,9 @@ def start_search(bid, tbw_list):
 
     print tbw_list[0][0], '聚合的类的话题规模', bid_like, bid_forward, bid_comment
 
-    txt_file.write(str(bid_like) + '\n' +
-                   str(bid_forward) + '\n' +
-                   str(bid_comment) + '\n')
+    # txt_file.write(str(bid_like) + '\n' +
+    #                str(bid_forward) + '\n' +
+    #                str(bid_comment) + '\n')
     txt_file.close()
     if bid_like + bid_forward + bid_comment == 0:
         deleted_dir = DOC_DIR + '/' + 'topic' + '/' + tbw_list[0][0]
@@ -108,7 +109,8 @@ def start_search(bid, tbw_list):
         # other_style_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
     #  存 interface_networkscale()和increment:
-        main_network()
+    #     main_network()
+
         corpus_dir = short_dir + 'uid=' + str(bid) + '.txt'
         label_dir = short_dir + 'new_label_link.xls'
         sna_dir = 'sna/'+ short_dir + 'SNA.png'

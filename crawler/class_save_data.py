@@ -7,7 +7,7 @@ __author__ = 'yc'
 import MySQLdb
 import datetime
 import re
-
+import _mysql_exceptions
 
 class Database:
     """
@@ -16,10 +16,10 @@ class Database:
 
     def __init__(self):
         self.conn = MySQLdb.connect(
-            host='127.0.0.1',  # 192.168.235.36 fig #192.168.1.41 me #192.168.1.40 jie
+            host='42.96.134.205',  # 192.168.235.36 fig #192.168.1.41 me #192.168.1.40 jie
             port=3306,
-            user='yc',
-            passwd='uliuli520',
+            user='root',
+            passwd='ViveMax2016',
             db='yuqing',
             charset='utf8', )
         now = datetime.datetime.now()
@@ -35,14 +35,20 @@ class Database:
         :param like: 点赞数
         :return:
         """
-        with self.conn:
-            cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-            insert = "INSERT INTO increment(event_id,check_time,comment_num,repost_num,like_num) " \
-                     "VALUES('%s','%s','%s','%s','%s')" % (eid, self.ctime, comment, repost, like)
-            print insert
-            cur.execute(insert)
-            print '数据已存入事件描述表'
-        return True
+        try:
+            with self.conn:
+                cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
+                insert = "INSERT INTO increment(event_id,check_time,comment_num,repost_num,like_num) " \
+                         "VALUES('%s','%s','%s','%s','%s')" % (eid, self.ctime, comment, repost, like)
+                print insert
+                cur.execute(insert)
+                print '数据已存入事件描述表'
+            return True
+        except _mysql_exceptions.IntegrityError:
+            print "外键约束"
+        except:
+            pass
+
 
     def save_network_scale(self, eid, cps='None', label='None', sna='None', leader='Unknown'):
         """
@@ -54,15 +60,20 @@ class Database:
         :param leader: 核心人物
         :return:
         """
-        with self.conn:
-            cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-            insert = "REPLACE INTO networkscale" \
-                     "(event_id,check_time,corpus_dir,label_dir,sna_dir,leader)" \
-                     " VALUES('%s','%s','%s','%s','%s','%s')" % \
-                     (eid, self.ctime, cps, label, sna, leader)
-            cur.execute(insert)
-            print '数据已存入网络规模表'
-        return True
+        try:
+            with self.conn:
+                cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
+                insert = "REPLACE INTO networkscale" \
+                         "(event_id,check_time,corpus_dir,label_dir,sna_dir,leader)" \
+                         " VALUES('%s','%s','%s','%s','%s','%s')" % \
+                         (eid, self.ctime, cps, label, sna, leader)
+                cur.execute(insert)
+                print '数据已存入网络规模表'
+            return True
+        except _mysql_exceptions.IntegrityError:
+            print "外键约束"
+        except:
+            pass
 
     def save_event(self, eid, ptime, etopic, origin, link):
         """
@@ -74,31 +85,36 @@ class Database:
         :param link: 链接
         :return:
         """
-        pptime = str(ptime)
-        date = re.search('(\d+)月(\d+)日', pptime)
-        time = re.search('(\d+):(\d+)', pptime)
-        if time is not None:
-            hour = int(time.group(1))
-            minute = int(time.group(2))
-        else:
-            hour = 0
-            minute = 0
-        ptime = datetime.datetime(2016, int(date.group(1)), int(date.group(2)), hour, minute)
-        with self.conn:
-            cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-            check = "select * from event where event_id='%s'" % eid
-            cur.execute(check)
-            rows = cur.fetchall()
-            if len(rows) == 0:
-                insert = "INSERT INTO event" \
-                         "(event_id,post_time,etopic,origin,link)" \
-                         " VALUES('%s','%s','%s','%s','%s')" % \
-                         (eid, ptime, etopic, origin, link)
-                cur.execute(insert)
-                print '数据已存入网络规模表'
+        try:
+            pptime = str(ptime)
+            date = re.search('(\d+)月(\d+)日', pptime)
+            time = re.search('(\d+):(\d+)', pptime)
+            if time is not None:
+                hour = int(time.group(1))
+                minute = int(time.group(2))
             else:
-                print '数据已存在'
-        return True
+                hour = 0
+                minute = 0
+            ptime = datetime.datetime(2016, int(date.group(1)), int(date.group(2)), hour, minute)
+            with self.conn:
+                cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
+                check = "select * from event where event_id='%s'" % eid
+                cur.execute(check)
+                rows = cur.fetchall()
+                if len(rows) == 0:
+                    insert = "INSERT INTO event" \
+                             "(event_id,post_time,etopic,origin,link)" \
+                             " VALUES('%s','%s','%s','%s','%s')" % \
+                             (eid, ptime, etopic, origin, link)
+                    cur.execute(insert)
+                    print '数据已存入网络规模表'
+                else:
+                    print '数据已存在'
+            return True
+        except _mysql_exceptions.IntegrityError:
+            print "外键约束"
+        except:
+            pass
 
 
     def save_headhunter(self, uid, name, gender='Unknown', bir='0000-00-00', vip='Unknown', loc='Unknown', pro='Unknown', tag='Unknown',
@@ -139,18 +155,23 @@ class Database:
         :param eid: 事件id
         :return:
         """
-        with self.conn:
-            cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-            check1 = "select * from event where event_id='%s'" % eid
-            cur.execute(check1)
-            rows = cur.fetchall()
-            if len(rows) != 0:
-                insert = "REPLACE INTO participate (user_id, event_id) VALUES('%s','%s')" % (uid, eid)
-                cur.execute(insert)
-                print "数据已存入参与关系表"
-            else:
-                print "不是热点事件"
-        return True
+        try:
+            with self.conn:
+                cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
+                check1 = "select * from event where event_id='%s'" % eid
+                cur.execute(check1)
+                rows = cur.fetchall()
+                if len(rows) != 0:
+                    insert = "REPLACE INTO participate (user_id, event_id) VALUES('%s','%s')" % (uid, eid)
+                    cur.execute(insert)
+                    print "数据已存入参与关系表"
+                else:
+                    print "不是热点事件"
+            return True
+        except _mysql_exceptions.IntegrityError:
+            print "外键约束"
+        except:
+            pass
 
     def save_content(self, bid, eid, ptime, tp, tpw, cnt, kw):
         """
@@ -164,31 +185,36 @@ class Database:
         :param kw: 博文内容分词
         :return:
         """
-        pptime = str(ptime)
-        date = re.search('(\d+)月(\d+)日', pptime)
-        time = re.search('(\d+):(\d+)', pptime)
-        if time is not None:
-            hour = int(time.group(1))
-            minute = int(time.group(2))
-        else:
-            hour = 0
-            minute = 0
-        ptime = datetime.datetime(2016, int(date.group(1)), int(date.group(2)), hour, minute)
-
-        with self.conn:
-            cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-            check = "select * from content where event_id='%s'" % eid
-            cur.execute(check)
-            rows = cur.fetchall()
-            if len(rows) == 0:
-            # check1 = "SELECT blog_id from content where blog_id='%s' or topic='%s'" % bid, tp
-                insert = "REPLACE INTO content (blog_id,post_time, event_id, topic, topic_words, content, keywords) " \
-                     "VALUES('%s','%s','%s','%s','%s','%s','%s')" % (bid, ptime, eid, tp, tpw, cnt, kw)
-                cur.execute(insert)
-                print "数据已存入事件内容表"
+        try:
+            pptime = str(ptime)
+            date = re.search('(\d+)月(\d+)日', pptime)
+            time = re.search('(\d+):(\d+)', pptime)
+            if time is not None:
+                hour = int(time.group(1))
+                minute = int(time.group(2))
             else:
-                print "数据已存在"
-        return True
+                hour = 0
+                minute = 0
+            ptime = datetime.datetime(2016, int(date.group(1)), int(date.group(2)), hour, minute)
+
+            with self.conn:
+                cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
+                check = "select * from content where event_id='%s'" % eid
+                cur.execute(check)
+                rows = cur.fetchall()
+                if len(rows) == 0:
+                # check1 = "SELECT blog_id from content where blog_id='%s' or topic='%s'" % bid, tp
+                    insert = "REPLACE INTO content (blog_id,post_time, event_id, topic, topic_words, content, keywords) " \
+                         "VALUES('%s','%s','%s','%s','%s','%s','%s')" % (bid, ptime, eid, tp, tpw, cnt, kw)
+                    cur.execute(insert)
+                    print "数据已存入事件内容表"
+                else:
+                    print "数据已存在"
+            return True
+        except _mysql_exceptions.IntegrityError:
+            print "外键约束"
+        except:
+            pass
 
     def update_eid(self, bid, eid):
         """
@@ -255,3 +281,4 @@ class Database:
     #         cur.execute(insert)
     #         print '数据已存入爬取微博表'
     #     return True
+# a = Database().conn

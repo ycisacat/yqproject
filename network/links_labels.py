@@ -50,24 +50,6 @@ def walk_path(root_dir):
     return path_tuple_list
 
 
-class BlogRoad:
-    """
-    记录博文传播路径的详细内容
-    始发博文ID
-    发布时间
-    博文内容
-    发布者ID
-    发布者名
-    转发路径列表
-    """
-
-    def __init__(self):
-        self.blog_id = ""
-        self.publish_time = ""
-        self.blog_content = ""
-        self.publisher_id = ""
-        self.publisher_name = ""
-        self.road_list = []
 
 
 def load_data_old(file_name):
@@ -76,47 +58,22 @@ def load_data_old(file_name):
     :return:首发博文,首发博文的用户,路径用户名列表,最后发表言论博文
     """
     file1 = open(file_name)
-    data_save_list = []
-    line = file1.readline().decode('utf-8')
-    while line:
-        blog_road = BlogRoad()
-        # 存储首发博文ID 1
-        blog_road.blog_id = line.strip()
-        # 存储博文发布时间 2
-        line = file1.readline().decode('utf-8')
-        blog_road.publish_time = line.strip()
-        # pass 3
-        line = file1.readline()
-        # 存储博文内容 4
-        line = file1.readline().decode('utf-8')
-        blog_road.blog_content = line.strip()
-        # pass 5
-        line =file1.readline()
-        # 存储该博文的发布者的ID 6
-        line = file1.readline().decode('utf-8')
-        blog_road.publisher_id = line.strip()
-        # 存储博文的发布者的用户名 7
-        line = file1.readline().decode('utf-8')
-        blog_road.publisher_name = line.strip()
-        # pass 8
-        file1.readline()
-        # pass 9
-        file1.readline()
-        # pass 10
-        file1.readline()
-        # pass 11
-        file1.readline()
-        # 存储该博文的转发路径
-        line = file1.readline().decode('utf-8')
-        while line:
-            if line.strip():
-                blog_road.road_list.append(line.strip())
-                line = file1.readline().decode('utf-8')
-            else:
-                line = file1.readline().decode('utf-8')
-                break
-        data_save_list.append(blog_road)
-    return data_save_list
+    # line = file1.readline().decode('utf-8')
+    lines = file1.readlines()
+    road_list = []
+    # print lines
+    for line in lines[:-1]:
+        if line.replace('\n', ''):
+            road_list.append(line.strip().decode('utf-8'))
+    # #
+    # # while line:
+    # #     if line.strip():
+    # #         road_list.append(line.strip())
+    # #         line = file1.readline().decode('utf-8')
+    # #     else:
+    # #         line = file1.readline().decode('utf-8')
+    print road_list, "*****"
+    return road_list
 
 
 def write_data_old(file_name, label_list, link_list):
@@ -144,55 +101,40 @@ def write_data_old(file_name, label_list, link_list):
     file_0.save(file_name)
 
 
-def link_label(blog_road_list):
-    """
-    转发路径中, 第一个 @用户名 转发的用户名, 第二个 @用户名 为转发上一个的用户的用户名.
-    若只有一个 @用户名 表明该博文是直接转发首发博文
-    :param blog_road_list: BlogRoad 列表
-    :return: 用户名列表, 用户-用户-权值 三元组
-    """
-    # try:
-    label_list = []  # 存储用户名列表
-    link_list = []  # 用户-用户-权值 列表
-    for blog_road in blog_road_list:
-        if blog_road.publisher_name not in label_list:
-            label_list.append(blog_road.publisher_name)
-        first_sy = label_list.index(blog_road.publisher_name)  # 发布者用户名的ID
-        pattern_name = re.compile(u'@(.*?)?[：:]')  # 匹配转发路径中出现的用户名
-        for road in blog_road.road_list:
-            name_list = re.findall(pattern_name, road)
-            if name_list.__len__() > 1:
-                if name_list[0] not in label_list:
-                    label_list.append(name_list[0])
-                if name_list[1] not in label_list:
-                    label_list.append(name_list[1])
-                link_list.append([label_list.index(name_list[0]), label_list.index(name_list[1]), 1])
-            else:
 
-                if name_list[0] not in label_list:
-                    label_list.append(name_list[0])
-                link_list.append([label_list.index(name_list[0]), first_sy, 1])
-
-    # except IndexError:
-    #     pass
+def link_label(road_list):
+    pattern_name = re.compile(u'@([^@]*?)[ |:|：]')  # 匹配转发路径中出现的用户名
+    link_list = []
+    label_list = []
+    for road in road_list:
+        print road
+        name_list = re.findall(pattern_name, road)
+        print '\n'.join(name_list)
+        print
+        if name_list[0] not in label_list:
+            label_list.append(name_list[0])
+        if name_list[1] not in label_list:
+            label_list.append(name_list[1])
+        link_list.append([label_list.index(name_list[0]), label_list.index(name_list[1]), 1])
     return link_list, label_list
 
 
 def create_xls():
     paths = walk_path('../documents/topic')
-    print paths
+    # print paths
     for path in paths:
         print path[1],
-        try:
-            blog_roads = load_data_old(path[1])
-            links, labels = link_label(blog_roads)
-        except:
-            print "这个txt的格式有问题(才良的锅)"
+        # try:
+        blog_roads = load_data_old(path[1])
+        links, labels = link_label(blog_roads)
+        # except:
+        #     print "这个txt的格式有问题"
+        #     continue
         # for l in labels:
         #     print labels.index(l), l
         # for l in links:
         #     print l
-        print 'done'
+        # print 'done'
         write_data_old(path[0]+'/label_link.xls', labels, links)
     return
 

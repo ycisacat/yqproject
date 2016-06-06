@@ -3,6 +3,8 @@ from os import mkdir
 import os
 
 __author__ = 'chenge'
+import sys
+sys.path.append('home/yc/PycharmProjects/yqproject/yqproject/settings.py')
 import re
 import urllib2, urllib, cookielib
 from yqproject.settings import *

@@ -34,7 +34,7 @@ class SearchTopic(WeiboPage):
             print "result_num", result_num[0]
 
             if int(result_num[0]) > 1000:
-                page_num = 10  # ps
+                page_num = 60  # ps
                 print "有", result_num[0], "条结果,判断为热点新闻"
             elif int(result_num[0]) <= 10:
                 page_num = 0
@@ -138,7 +138,7 @@ class SearchTopic(WeiboPage):
         reason_repeat_list = []
         blog_origin = []
         if int(fwd_num) > 100:
-            forward_pages = 10  # ps
+            forward_pages = 60  # ps
         elif int(fwd_num) <= 10:
             forward_pages = 1
         else:
@@ -237,7 +237,7 @@ class SearchTopic(WeiboPage):
                         total_result_list.append(result_list)
 
                         for reason in no_repeat_reason_list:  # 爬取转发路径，存储转发路径
-                            rpt_reason_list.append(str(reason) + '@' + user_name)
+                            rpt_reason_list.append(str(reason) + '@' + user_name+":")
 
                         total_reason_list.append(rpt_reason_list)
 

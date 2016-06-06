@@ -22,6 +22,8 @@ every
 likely
 even
 +
+[
+]
 这儿
 above
 new

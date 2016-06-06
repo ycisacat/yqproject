@@ -42,7 +42,7 @@ class SaveData:
             # 这个是以事件为单位的别弄错
             bid_index = self.bid_list.index(keys)
             event_id = 'tp' + keys  # tp+bid1
-            print 'event_id-----------------------------',event_id
+            # print 'event_id-----------------------------',event_id
             post_time = self.ptime_list[bid_index] # bid1的post time
             etopic = self.title_list[bid_index]
             origin = self.bid_uid[keys][0]
@@ -68,7 +68,7 @@ class SaveData:
         for (bid, values) in self.bid_uid.items():  # {bid: (uid,XXX)}
             user_id = values[0]  # 用户,uid,希望你还能对的上
             event_id = 'tp' + bid  # eid,希望你还能对得上号
-            print 'event_id_participate--------------------', event_id
+            # print 'event_id_participate--------------------', event_id
             self.db.save_participate(user_id, event_id)
 
 

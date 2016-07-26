@@ -1,4 +1,6 @@
 #coding=utf-8
+import time
+
 __author__ = 'yc'
 
 import multiprocessing as mul

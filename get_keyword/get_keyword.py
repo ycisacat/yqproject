@@ -84,10 +84,10 @@ class Keyword():
             keywords = []
             # 输出前几个关键词
             for key in key_score[0:4]:
-                print key[0]
+                # print key[0]
                 keywords.append(key[0])
             end = time.clock()
-            print "read  score(): %f  s" % (end-start)
+            # print "read  score(): %f  s" % (end-start)
             return keywords
 
     def combine_keywords(self, string_data):

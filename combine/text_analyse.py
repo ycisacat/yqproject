@@ -103,16 +103,16 @@ def title_cluster(title_list, rate=0.35):
 
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
     # titles = load_file('title')
     # titles = ['数据瓦囧实验室', '数据挖掘实验室', '古才良', '古才良的', '我是古才良', '梁兄一坐', '一切暗号']
-    # titles = ['#梁兄一坐#', '一切暗号', '#数据瓦囧实验室#', '数据挖掘实验室', '古才良', '古才良的', '我是古才良']
-    # print titles
-    # index_result = title_cluster(titles)
-    # print index_result
-    # for com in index_result:
-    #     print "该类的代表bid及标题", com[0]
-    #     for bid_index in com:
-    #         # bid = bid_list[bid_index]
-    #         print bid_index
-    #     # print com , 'kk'
+    titles = ['我是古才良','#梁兄一坐#', '一切暗号', '#数据瓦囧实验室#', '数据挖掘实验室', '古才良', '古才良的' ]
+    print titles
+    index_result = title_cluster(titles)
+    print index_result
+    for com in index_result:
+        print "该类的代表bid及标题", com[0]
+        for bid_index in com:
+            # bid = bid_list[bid_index]
+            print bid_index
+        # print com , 'kk'

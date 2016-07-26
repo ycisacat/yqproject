@@ -28,7 +28,7 @@ def detection():
     rand_account = random.sample(account, 3)  # 从 account 中随机获取5个元素，作为一个list返回
     threads = []
     for acc in rand_account:
-        print "当前猎头：", acc, account[acc]
+        # print "当前猎头：", acc, account[acc]
         s = multiprocessing.Semaphore(3)
         detection_process = multiprocessing.Process(target=GetHunterWeibo().one_id_text,
                                                     args=(account[acc], 1, 2, s))  # 爬取全部猎头的博文进行检索

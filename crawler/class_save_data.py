@@ -166,7 +166,7 @@ class Database:
                     cur.execute(insert)
                     print "数据已存入参与关系表"
                 else:
-                    print "不是热点事件"
+                    print eid,"不是热点事件"
             return True
         except _mysql_exceptions.IntegrityError:
             print "外键约束"

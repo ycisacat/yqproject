@@ -96,6 +96,7 @@ class GetHunterWeibo(WeiboPage):
                 url = "http://weibo.cn/u/" + str(one_user) + "?page=" + str(k)  # 猎头的首页
                 req = urllib2.Request(url=url, headers=self.header)
                 homepage = urllib2.urlopen(req).read()
+                # print homepage
 
                 base_patterns = re.compile(
                     'class="c" id="(.*?)">.*?<span class="ctt">(.*?)</span>.*?>赞\[(\d+)]</a>&nbsp;<a href="(.*?)">转发\[(\d+)]</a>&nbsp;<a href="(.*?)" class="cc">评论\[(\d+)]</a>.*?<span class="ct">(.*?)&nbsp',

@@ -11,7 +11,6 @@ class SaveData:
     # data = pack_tbw()  # return pack_dict, bid_list, title_list, tw_list, ptime_list, content, bid_uiddict
 
     def __init__(self):
-        print "safa"
         data = pack_tbw()
         self.pack_dict = data[0]
         self.bid_list = data[1]

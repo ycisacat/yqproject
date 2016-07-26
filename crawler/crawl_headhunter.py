@@ -247,19 +247,19 @@ class Sina():
         """
 
         try:
-            print '用户名: ', self.get_name()
-            print 'id: ', self.get_uid()
-            print '微博数: ', self.get_weibo_num()
-            print '关注数: ', self.get_follows_num()
-            print '粉丝数: ', self.get_fans_num()
-            print '是否大v： ', self.isbig_v()
-            print '性别： ', self.get_sex()
-            print '地区： ', self.get_area()
-            print '生日： ', self.get_birthday()
-            print '认证： ', self.get_authentication()
-            print '认证信息： ', self.get_authentic_info()
-            print '简介： ', self.get_brief_intro()
-            print '用户标签:', self.get_tags()
+            # print '用户名: ', self.get_name()
+            # print 'id: ', self.get_uid()
+            # print '微博数: ', self.get_weibo_num()
+            # print '关注数: ', self.get_follows_num()
+            # print '粉丝数: ', self.get_fans_num()
+            # print '是否大v： ', self.isbig_v()
+            # print '性别： ', self.get_sex()
+            # print '地区： ', self.get_area()
+            # print '生日： ', self.get_birthday()
+            # print '认证： ', self.get_authentication()
+            # print '认证信息： ', self.get_authentic_info()
+            # print '简介： ', self.get_brief_intro()
+            # print '用户标签:', self.get_tags()
 
             if os.path.exists(self.data_dir):
                 pass

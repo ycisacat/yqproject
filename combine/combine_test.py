@@ -2,7 +2,7 @@
 
 __author__ = 'root'
 import numpy as np
-import copy
+import copy_file
 import jieba.posseg as pseg
 import Levenshtein
 class TextAnalyse:
@@ -70,4 +70,4 @@ class TextAnalyse:
 
 t = TextAnalyse()
 # print t.similay('陈戈', '古才良')
-print t.similay('陈戈', '陈四画')
+print t.similay('上海迪士尼一个肉包35元比日本还贵网友：人傻钱多速来', '上海迪士尼一个肉包35元网友:人傻钱多速来')

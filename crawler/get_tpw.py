@@ -90,7 +90,7 @@ def get_tpw(tpdict):
             content_list.append(values[0])
 
         else:
-            print "这篇博文没有话题，检测不到事件"
+            print "这篇猎头博文没有话题，检测不到事件"
 
     return bid_list, title_list, tw_list, ptime_list, content_list
 

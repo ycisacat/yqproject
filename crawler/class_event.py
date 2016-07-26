@@ -56,7 +56,7 @@ class Event(Database):
         """
         with self.conn:
             cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-            sql = "SELECT DISTINCT event_id,etopic FROM event WHERE etopic ='%s'" % topic
+            sql = "SELECT DISTINCT event_id,etopic FROM event WHERE etopic ='%s' limit 1" % topic
             cur.execute(sql)
             rows = cur.fetchall()
             if len(rows) == 0:
@@ -99,7 +99,7 @@ class Event(Database):
             rows = cur.fetchall() #({},{}),({'topic': u'111', 'day': 25L, 'month': 4L},)
             # print 'get timeline',rows
             if len(rows) == 0:
-                default = False
+                default = ()
                 return default
             else:
                 return rows

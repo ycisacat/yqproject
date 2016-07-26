@@ -71,6 +71,8 @@ def line_chart(request, topic=''):
             print 'invalid form'
     else :
         eid_tuple = Event().search_exact_topic(topic)
+        # print topic
+        # print eid_tuple
 
     if len(eid_tuple) == 0:
         return render_to_response('error.html')
@@ -103,8 +105,12 @@ def line_chart(request, topic=''):
             old_file = open(BASE_DIR + '/static/scripts/lineChart.js', 'rw')
             new_file = open(BASE_DIR + '/static/scripts/line_chart.js', 'w+')
             rw = old_file.readlines()
-            rw[40] = rw[40].replace('xaxis', xaxis)
-            rw[71] = rw[71].replace('seris_data', seris_data)
+            oldx = "['6:00','7:00','8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','24:00','1:00','2:00','3:00','4:00']"
+            oldd = "[1,3,5,10,12,18,28,30,20,15,12,9,7,8,12,19,16,10,7,4,2,0,0,0,0,0]"
+            rw[41] = rw[41].replace(oldx, xaxis)
+            rw[74] = rw[74].replace(oldd, seris_data)
+            # print rw[42]
+            # print rw[75]
             for i in rw:
                 new_file.write(i)
         return render(request, 'lineChart.html',

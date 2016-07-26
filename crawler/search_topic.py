@@ -31,11 +31,11 @@ class SearchTopic(WeiboPage):
             result_num = result_num_pattern.findall(result_page)
             if not result_num:
                 result_num.append(1)
-            print "result_num", result_num[0]
+            # print "result_num", result_num[0]
 
             if int(result_num[0]) > 1000:
                 page_num = 60  # ps
-                print "有", result_num[0], "条结果,判断为热点新闻"
+                # print "有", result_num[0], "条结果,判断为热点新闻"
             elif int(result_num[0]) <= 10:
                 page_num = 0
             else:
@@ -43,14 +43,14 @@ class SearchTopic(WeiboPage):
                     page_num = int(result_num[0]) / 10 + 1
                 else:
                     page_num = int(result_num[0]) / 10
-                print "有", result_num[0], "条结果,判断为热点新闻"
+                # print "有", result_num[0], "条结果,判断为热点新闻"
             return page_num
 
         else:
             req = urllib2.Request(url=hot_url, headers=self.header)
             result_page = urllib2.urlopen(req).read()
             if "抱歉，未找到" in result_page:
-                print "看来真的没有结果了~~~"
+                # print "看来真的没有结果了~~~"
                 return False
 
     def get_id_name(self, item):
@@ -97,11 +97,11 @@ class SearchTopic(WeiboPage):
         like_forward_comment_patternts = re.compile(
             '>赞\[(\d+)]</a>&nbsp;<a href="(.*?)">转发\[(\d+)]</a>&nbsp;<a href="(.*?)" class="cc">评论\[(\d+)]</a>')
         like_forward_comment = like_forward_comment_patternts.findall(item)
-        print "点赞", like_forward_comment[0][0]
+        # print "点赞", like_forward_comment[0][0]
         self.like_all_num += int(like_forward_comment[0][0])  # 计算总和，记录该话题的点赞规模
-        print "转发", like_forward_comment[0][2], like_forward_comment[0][1]
+        # print "转发", like_forward_comment[0][2], like_forward_comment[0][1]
         self.forward_all_num += int(like_forward_comment[0][2])  # 计算总和，记录该话题的转发规模
-        print "评论", like_forward_comment[0][4], like_forward_comment[0][3]
+        # print "评论", like_forward_comment[0][4], like_forward_comment[0][3]
         self.comment_all_num += int(like_forward_comment[0][4])  # 计算总和，记录该话题的评论规模
         return like_forward_comment[0][0], like_forward_comment[0][2], like_forward_comment[0][4], \
                like_forward_comment[0][1]
@@ -176,7 +176,7 @@ class SearchTopic(WeiboPage):
             topic_result = re.sub(topic_clean2_pattern, '', topic)
 
         else:
-            print "这篇博文没有话题，检测不到事件"
+            # print "这篇博文没有话题，检测不到事件"
             topic_result = '未知'
         return topic_result
 
@@ -245,15 +245,15 @@ class SearchTopic(WeiboPage):
                         issuer_id_name_pattern = re.compile(
                             '<a class="nk" href="http://weibo.cn/(.*?)">(.*?)</a>')  # 匹配一段里面的名字和id
                         issuer_id_name = issuer_id_name_pattern.findall(item)
-                        print "非大v博文用户id和名字", issuer_id_name[0][0], issuer_id_name[0][1]
+                        # print "非大v博文用户id和名字", issuer_id_name[0][0], issuer_id_name[0][1]
 
             lfc_all_num.append(self.like_all_num)
             lfc_all_num.append(self.forward_all_num)
             lfc_all_num.append(self.comment_all_num)
 
-            print "转发该话题的转发者是大的v个数：", big_v_num
+            # print "转发该话题的转发者是大的v个数：", big_v_num
         else:
-            print "搜索结果少于10个，直接忽略"
+            # print "搜索结果少于10个，直接忽略"
             lfc_all_num = [0, 0, 0]  # 不是热点，规模初始值为0
         return total_result_list, total_reason_list, lfc_all_num
 

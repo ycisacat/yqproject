@@ -29,14 +29,14 @@
 					<h2>{{ event }}</h2>
 				</div>
                 <div>
-                    <p><span>转发量: </span>{{ rpt }}</p>
-                    <p><span>点赞量: </span>{{ lik }}</p>
-                    <p><span>评论量: </span>{{ cmt }}</p>
+                    <p class="statics"><span class="label">转发量</span><span class="num">{{ rpt }}</span></p>
+                    <p class="statics"><span class="label">点赞量</span><span class="num">{{ lik }}</span></p>
+                    <p class="statics"><span class="label">评论量</span><span class="num">{{ cmt }}</span></p>
                     <span class="con">
-                        <h4>博文:</h4>
+                        <h4>博文</h4>
                         <p>{{ cnt }}</p>
-                        <h4>关键词:</h4>
-                        <p>{{ topic_words }}</p>
+                        <h4>关键词</h4>
+                        <p class="kew-words">{{ topic_words }}</p>
                     </span>
 
                 </div>
@@ -50,7 +50,7 @@
 	<script type="text/javascript" src={% static "scripts/jquery-1.10.1.js" %}></script>
 	<script type="text/javascript" src={% static "scripts/echarts-all.js" %}></script>
 	{% if default %}
-        <script type="text/javascript" src={% static "scripts/linechart.js" %}></script>
+        <script type="text/javascript" src={% static "scripts/lineChart.js" %}></script>
     {% else %}
         <script type="text/javascript" src={% static "scripts/line_chart.js" %}></script>
     {% endif %}

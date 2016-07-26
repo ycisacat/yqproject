@@ -28,13 +28,15 @@
 		</div>
 		<div id="pageBody">
 			<div id="sidebar">
+                <div id="siderbar-container">
 				<div id="title">
 					<h2>{{ event }}</h2>
 				</div>
-                <div>
-                    <p><span>参与规模: </span>{{ scale }}</p>
-                    <span class="con">
-                        <h4>关键人物:</h4>
+                <div class="content">
+                    <h4 class="core-subject">核心主体数</h4>
+                    <p class="subject-num">{{ scale }}</p>
+{#                    <span class="con">#}
+                    <h4 class="key-person">关键人物</h4>
                     <form id="form1" runat="server">
                     <div class="scrollNews" >
                     <ul>
@@ -62,9 +64,10 @@
 {#</ul>#}
 {#</div>#}
 {#</form>#}
-                        <a class="pic" href=" "><img src="/static/{{ pic_dir }}" height="200" width="200"></a>
+                        <a class="pic" id="pic" href=" "><img src="/static/{{ pic_dir }}" ><span id="pic_hover"><img src="/static/{{ pic_dir }}" ></span></a>
 
-                    </span>
+{#                    </span>#}
+                </div>
 
                 </div>
 {#				<button id="haha">more</button>#}
@@ -149,5 +152,19 @@ $("#tooltip").css({
 	    };
 	    network = new vis.Network(container, data, options); 
 	</script>
+    <script>
+        var pic=document.getElementById('pic');
+        var pic_hover=document.getElementById('pic_hover');
+        pic.onmouseenter = function(){
+            pic_hover.style.display='block';
+{#            pic.style.display="none";#}
+        }
+        pic_hover.onmouseleave = function(){
+            pic_hover.style.display="none";
+{#            pic.style.display="block";#}
+        }
+
+
+    </script>
 </body>
 </html>

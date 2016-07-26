@@ -31,33 +31,49 @@ class Increment(Database):
         with self.conn:
             flag = False
             cur = self.conn.cursor(MySQLdb.cursors.DictCursor)
-            num_sql = "SELECT COUNT(event_id) AS c,MAX(iid) AS b,Min(iid) AS s From increment WHERE event_id='%s'" % (eid)
-            cur.execute(num_sql)
-            num = cur.fetchall()[0]
-            biggest = num['b']
-            smallest = num['s']
-            count = num['c']
-            if count < 4:
-                rows = []
-                return rows
-            if count > 10:
-                smallest = biggest - 11
-            select = "SELECT post_time,Hour(post_time) AS hour, MIN(post_time) As min, comment_num, repost_num, like_num FROM increment WHERE iid BETWEEN %s AND %s" % (smallest, biggest)
+            # num_sql = "SELECT COUNT(event_id) AS c,MAX(iid) AS b,Min(iid) AS s From increment WHERE event_id='%s'" % (eid)
+            # cur.execute(num_sql)
+            # num = cur.fetchall()[0]
+            # print 'num',num
+            # biggest = num['b']
+            # smallest = num['s']
+            # count = num['c']
+            # if count < 4:
+            #     rows = []
+            #     return rows
+            # if count > 10:
+            #     smallest = biggest - 11
+            select = "select iid,Hour(check_time) AS hour,comment_num, repost_num," \
+                     " like_num from (select * from increment where event_id = '%s' order by iid desc limit 11) as temp order by hour asc" % eid
+            # select = "SELECT iid,check_time,Hour(check_time) AS hour, MIN(check_time) As min, comment_num, repost_num, like_num FROM (select * from increment WHERE iid BETWEEN %s AND %s" % (smallest, biggest)
+            print select
             cur.execute(select)
-            rows = cur.fetchall()  # ({'post_time': datetime.datetime(2016, 3, 26, 19, 4), 'comment_num': 1575L},)
-            for i in range(len(rows) - 1):
-                delta_comment = rows[i+1]['comment_num'] - rows[i]['comment_num']
-                delta_repost = rows[i+1]['repost_num'] - rows[i]['repost_num']
-                delta_like = rows[i+1]['like_num'] - rows[i]['like_num']
+            rows = cur.fetchall()  # ({'check_time': datetime.datetime(2016, 3, 26, 19, 4), 'comment_num': 1575L},)
+            # print 'rows',rows
+            dist_rows=[rows[0]]
+            for i in range(1,len(rows)):
+                if rows[i]['hour'] != rows[i-1]['hour']:
+                    dist_rows.append(rows[i])
+                else:
+                    pass
+            # print dist_rows
+            if len(dist_rows) <4:
+                rt_rows=[]
+                return rt_rows
+            for i in range(len(dist_rows) - 1):
+                delta_comment = dist_rows[i+1]['comment_num'] - dist_rows[i]['comment_num']
+                delta_repost = dist_rows[i+1]['repost_num'] - dist_rows[i]['repost_num']
+                delta_like = dist_rows[i+1]['like_num'] - dist_rows[i]['like_num']
                 delta_all_num = delta_comment+delta_like+delta_repost
-                delta_time = rows[i+1]['post_time']-rows[i]['post_time']
+                delta_time = dist_rows[i+1]['hour']-dist_rows[i]['hour']
                 scale_rate = delta_all_num/delta_time
-                self.scale_rate.append(scale_rate)
-                xaxis = str(rows[i+1]['hour']+':'+str(rows[i+1]['min']))
+                # print 'ddd',delta_all_num,scale_rate
+                self.scale_rate.append(str(scale_rate))
+                xaxis = str(dist_rows[i+1]['hour'])+':00'
                 self.time_list.append(xaxis)  # 以后来的时间为横轴坐标
-            print 'x轴', self.time_list
-            print '数据', self.scale_rate
-            return rows
+            # print 'x轴', self.time_list
+            # print '数据', self.scale_rate
+            return dist_rows
 
 
 

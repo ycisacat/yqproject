@@ -57,7 +57,8 @@ class CandidateWords:
                     self.emo_sign.append(s)
                 # 去除表情
                 for s in self.emo_sign:
-                    f_match.remove(s)
+                    if s in f_match:
+                        f_match.remove(s)
                 importance = jieba.cut("".join(f_match))
                 import_word = list(importance)
                 for i in import_word:

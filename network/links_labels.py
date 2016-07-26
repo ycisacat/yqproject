@@ -40,6 +40,7 @@ def walk_path(root_dir):
     path_tuple_list = []
     list_dirs = os.walk(root_dir)
     for root, dirs, files in list_dirs:
+        print files
         if "label_link.xls" in files:  # 若存在该excel表 表示已分析过 跳过该文件夹
             continue
         for f in files:
@@ -47,6 +48,7 @@ def walk_path(root_dir):
             #     continue
             if f.startswith('uid'):
                 path_tuple_list.append((root, os.path.join(root, f)))
+    print path_tuple_list
     return path_tuple_list
 
 
@@ -72,7 +74,7 @@ def load_data_old(file_name):
     # #         line = file1.readline().decode('utf-8')
     # #     else:
     # #         line = file1.readline().decode('utf-8')
-    print road_list, "*****"
+    # print road_list, "*****"
     return road_list
 
 
@@ -107,10 +109,10 @@ def link_label(road_list):
     link_list = []
     label_list = []
     for road in road_list:
-        print road
+        # print road
         name_list = re.findall(pattern_name, road)
-        print '\n'.join(name_list)
-        print
+        # print '\n'.join(name_list)
+        # print
         if name_list[0] not in label_list:
             label_list.append(name_list[0])
         if name_list[1] not in label_list:
@@ -119,11 +121,12 @@ def link_label(road_list):
     return link_list, label_list
 
 
-def create_xls():
-    paths = walk_path('../documents/topic')
+def create_xls(topic_time_path):
+    # paths = walk_path('../documents/topic')
+    paths = walk_path(topic_time_path)
     # print paths
     for path in paths:
-        print path[1],
+        # print path[1],
         # try:
         blog_roads = load_data_old(path[1])
         links, labels = link_label(blog_roads)
@@ -138,6 +141,6 @@ def create_xls():
         write_data_old(path[0]+'/label_link.xls', labels, links)
     return
 
-if __name__ == '__main__':
-    create_xls()
+# if __name__ == '__main__':
+#     create_xls('../documents/topic/香格里拉对话：美国防长对中国“又打又拉”/2016-06-06 22:44:48')
 

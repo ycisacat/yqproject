@@ -17,10 +17,10 @@ class GetHunterForwardPath(WeiboPage):
         for i in value:
             forward_path_file = open(self.forward_path_dir + 'uid=' + str(key[0]) + '.txt', 'w+')
             for j in i:
-                print "id,时间,博文id,博文,点赞,转发链接,转发量,评论链接,评论量", key[0], j[0], j[1], j[2], j[3], j[4], j[5], j[6], j[7]
+                # print "id,时间,博文id,博文,点赞,转发链接,转发量,评论链接,评论量", key[0], j[0], j[1], j[2], j[3], j[4], j[5], j[6], j[7]
                 url = j[4]
-                print "博文为：", j[1] + ' ' + j[2]
-                print "该转发链接： ", url
+                # print "博文为：", j[1] + ' ' + j[2]
+                # print "该转发链接： ", url
                 req = urllib2.Request(url=url, headers=self.header)
                 forward_page = urllib2.urlopen(req).read()
 

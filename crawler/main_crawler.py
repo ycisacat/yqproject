@@ -5,6 +5,7 @@ sys.path.append('home/yc/PycharmProjects/yqproject/yqproject/settings.py')
 # from crawl_weibo import *
 from detection import *
 from search_topic import *
+from copy_file import *
 """
 5.27测试完毕
 """
@@ -18,19 +19,22 @@ def run():
     detection()  # 检测新事件，进而更新话题列表
     print '开始搜索'
     muL_ss()  # 对新的话题列表进行重新分类，并开始搜索
-    main_network()
+    # main_network()
+
 
 def main_weibo():
     """
         模拟登陆后，每一小时运行一次
         :return:
     """
-    MoblieWeibo().login('1939777358@qq.com', '123456a') #'70705420yc@sina.com', '1234567')
+    MoblieWeibo().login('meilanyiyou419@163.com','aaa333')#('1939777358@qq.com', '123456a') #'70705420yc@sina.com', '1234567')
     # 'odlmyfbw@sina.cn','tttt5555')#'1939777358@qq.com', '123456a')
 
     while True:
         run()
+        copy_file()
         print "即将休息一下"
+
         sleep(3600)
         print "程序睡醒"
 
